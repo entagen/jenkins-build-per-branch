@@ -40,7 +40,6 @@ process.in.text.eachLine {String line ->
 for (String branchName in branches) {
     for (String baseTemplateName in baseTemplateProjectNames.sort()) {
         if (!currentBuilds.contains("$baseTemplateName-$branchName".toString())) {
-            println("adding $baseTemplateName-$branchName")
             api.copyJobAndSetBranch(baseTemplateName, branchName, templateJobSuffix, templateProjectNames)
         }
     }
@@ -68,6 +67,7 @@ class JenkinsApi {
     }
 
     List<String> getProjectNames(String prefix) {
+        println "getting project names"
         def response = restClient.get(path: 'api/json')
         response.data.jobs.name.findAll({it.startsWith(prefix)})
     }
@@ -87,25 +87,30 @@ class JenkinsApi {
             config = config.replaceAll(templateJobName, "${baseName}${branchName}")
         }
 
+        println("adding job $baseTemplateName-$branchName")
         post('createItem', config, [name: "${baseJobName}-${branchName}"], ContentType.XML)
     }
 
     void deleteJob(String jobName) {
+        println "deleting job $jobName"
         post("job/${jobName}/doDelete")
     }
 
-    void createViewForBranch(String baseName, String branchName){
+    void createViewForBranch(String baseName, String branchName) {
         String viewName = "$baseName-$branchName"
         Map body = [name: viewName, mode: 'hudson.model.ListView', Submit: 'OK', json: '{"name": "' + viewName + '", "mode": "hudson.model.ListView"}']
+        println "creating view ${viewName}"
         post('createView', body)
 
-        body = [useincluderegex: 'on', includeRegex: 'BuildTripleMap*.*Master', name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "BuildTripleMap*.*Master"}}']
+        body = [useincluderegex: 'on', includeRegex: "BuildTripleMap*.*${branchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "BuildTripleMap*.*' + branchName + '"},' + VIEW_COLUMNS_JSON + '}']
 
+        println "configuring view ${viewName}"
         post("view/${viewName}/configSubmit", body)
 
     }
 
-    void deleteView(String viewName){
+    void deleteView(String viewName) {
+        println "deleting view"
         post("view/${viewName}/doDelete")
     }
 
@@ -129,5 +134,37 @@ class JenkinsApi {
         status
     }
 
+    static final String VIEW_COLUMNS_JSON = '''
+"columns":[
+      {
+         "stapler-class":"hudson.views.StatusColumn",
+         "kind":"hudson.views.StatusColumn$DescriptorImpl"
+      },
+      {
+         "stapler-class":"hudson.views.WeatherColumn",
+         "kind":"hudson.views.WeatherColumn$DescriptorImpl"
+      },
+      {
+         "stapler-class":"hudson.views.JobColumn",
+         "kind":"hudson.views.JobColumn$DescriptorImpl"
+      },
+      {
+         "stapler-class":"hudson.views.LastSuccessColumn",
+         "kind":"hudson.views.LastSuccessColumn$DescriptorImpl"
+      },
+      {
+         "stapler-class":"hudson.views.LastFailureColumn",
+         "kind":"hudson.views.LastFailureColumn$DescriptorImpl"
+      },
+      {
+         "stapler-class":"hudson.views.LastDurationColumn",
+         "kind":"hudson.views.LastDurationColumn$DescriptorImpl"
+      },
+      {
+         "stapler-class":"hudson.views.BuildButtonColumn",
+         "kind":"hudson.views.BuildButtonColumn$DescriptorImpl"
+      }
+   ]
+'''
 
 }
