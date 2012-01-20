@@ -20,7 +20,6 @@ JenkinsApi api = new JenkinsApi('http://macallan:8081/')
 //    }
 //}
 
-
 Set currentBuilds = api.getProjectNames(templateJobPrefix)
 
 Set templateProjectNames = currentBuilds.findAll { it.startsWith(templateJobPrefix) && it.endsWith('-' + templateJobSuffix) }
@@ -45,6 +44,9 @@ for (String branchName in branches) {
             api.copyJobAndSetBranch(baseTemplateName, branchName, templateJobSuffix, templateProjectNames)
         }
     }
+    // there isn't a good way to retrieve a list of views, so just try to create them every time
+    // jenkins will just 400 error on the duplicates
+    api.createViewForBranch('TripleMap', branchName)
 
 }
 
@@ -93,7 +95,18 @@ class JenkinsApi {
     }
 
     void createViewForBranch(String baseName, String branchName){
-        post()
+        String viewName = "$baseName-$branchName"
+        Map body = [name: viewName, mode: 'hudson.model.ListView', Submit: 'OK', json: '{"name": "' + viewName + '", "mode": "hudson.model.ListView"}']
+        post('createView', body)
+
+        body = [useincluderegex: 'on', includeRegex: 'BuildTripleMap*.*Master', name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "BuildTripleMap*.*Master"}}']
+
+        post("view/${viewName}/configSubmit", body)
+
+    }
+
+    void deleteView(String viewName){
+        post("view/${viewName}/doDelete")
     }
 
     /**
