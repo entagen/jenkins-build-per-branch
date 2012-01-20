@@ -87,7 +87,7 @@ class JenkinsApi {
             config = config.replaceAll(templateJobName, "${baseName}${branchName}")
         }
 
-        println("adding job $baseTemplateName-$branchName")
+        println("adding job $baseJobName-$branchName")
         post('createItem', config, [name: "${baseJobName}-${branchName}"], ContentType.XML)
     }
 
