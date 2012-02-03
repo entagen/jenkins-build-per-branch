@@ -45,7 +45,7 @@ for (String branchName in branches) {
     }
     // there isn't a good way to retrieve a list of views, so just try to create them every time
     // jenkins will just 400 error on the duplicates
-    api.createViewForBranch('TripleMap', branchName)
+    api.createViewForBranch('TM', branchName)
 
 }
 
