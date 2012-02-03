@@ -33,9 +33,12 @@ process.waitFor()
 process.in.text.eachLine {String line ->
     String branchName = line.substring(line.indexOf('refs/heads/')) - 'refs/heads/'
     if (branchName != templateJobSuffix) {
-        branches << branchName
+        branches << branchName.replaceAll('/','_')
     }
 }
+
+List views = api.getViews()
+Set viewNames = views.collect{it.name}
 
 for (String branchName in branches) {
     for (String baseTemplateName in baseTemplateProjectNames.sort()) {
@@ -43,9 +46,11 @@ for (String branchName in branches) {
             api.copyJobAndSetBranch(baseTemplateName, branchName, templateJobSuffix, templateProjectNames)
         }
     }
-    // there isn't a good way to retrieve a list of views, so just try to create them every time
-    // jenkins will just 400 error on the duplicates
-    api.createViewForBranch('TripleMap', branchName)
+
+    String baseName = 'TM'
+    if (!viewNames.contains("$baseName-$branchName")){
+        api.createViewForBranch(baseName, branchName)
+    }
 
 }
 
@@ -55,6 +60,13 @@ println 'toDelete: ' + buildsToDelete
 
 buildsToDelete.each {
     api.deleteJob(it)
+}
+
+// Delete views that don't have jobs
+views.each { view ->
+    if (!view.jobs) {
+        api.deleteView(view.name)
+    }
 }
 
 class JenkinsApi {
@@ -107,6 +119,18 @@ class JenkinsApi {
         println "configuring view ${viewName}"
         post("view/${viewName}/configSubmit", body)
 
+    }
+
+    List getViews() {
+        println "getting views"
+        def response = restClient.get(path: 'api/json', query: [tree:'views[name,jobs[name]]'])
+        response.data.views
+    }
+
+    List getViewNames() {
+        println "getting views"
+        def response = restClient.get(path: 'api/json', query: [tree:'views[name,jobs[name]]'])
+        response.data.views
     }
 
     void deleteView(String viewName) {
