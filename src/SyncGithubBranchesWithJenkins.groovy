@@ -48,10 +48,9 @@ for (String branchName in branches) {
     }
 
     String baseName = 'TM'
-    if (!viewNames.contains("$baseName-$branchName")){
+    if (!viewNames.contains("$baseName-$branchName".toString())){
         api.createViewForBranch(baseName, branchName)
     }
-
 }
 
 Set expectedBuilds = branches.collect {branch -> baseTemplateProjectNames.collect {it + "-${branch}"} }.flatten()
