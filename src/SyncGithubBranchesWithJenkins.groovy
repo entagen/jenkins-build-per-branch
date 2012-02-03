@@ -27,33 +27,34 @@ Set baseTemplateProjectNames = templateProjectNames.collect {(it.minus('-' + tem
 
 String branchesCommand = "git ls-remote --heads ${gitUrl}"
 
-Set branches = []
+Map<String, String> branches = [:]
 def process = branchesCommand.execute()
 process.waitFor()
 process.in.text.eachLine {String line ->
     String branchName = line.substring(line.indexOf('refs/heads/')) - 'refs/heads/'
     if (branchName != templateJobSuffix) {
-        branches << branchName.replaceAll('/','_')
+        branches[branchName] = branchName.replaceAll('/', '_')
     }
 }
 
 List views = api.getViews()
-Set viewNames = views.collect{it.name}
+Set viewNames = views.collect {it.name}
 
-for (String branchName in branches) {
+for (String branchName in branches.keySet()) {
+    String branchDisplayName = branches[branchName]
     for (String baseTemplateName in baseTemplateProjectNames.sort()) {
-        if (!currentBuilds.contains("$baseTemplateName-$branchName".toString())) {
-            api.copyJobAndSetBranch(baseTemplateName, branchName, templateJobSuffix, templateProjectNames)
+        if (!currentBuilds.contains("$baseTemplateName-${branchDisplayName}".toString())) {
+            api.copyJobAndSetBranch(baseTemplateName, branchName, branchDisplayName, templateJobSuffix, templateProjectNames)
         }
     }
 
     String baseName = 'TM'
-    if (!viewNames.contains("$baseName-$branchName".toString())){
-        api.createViewForBranch(baseName, branchName)
+    if (!viewNames.contains("$baseName-$branchDisplayName".toString())) {
+        api.createViewForBranch(baseName, branchDisplayName)
     }
 }
 
-Set expectedBuilds = branches.collect {branch -> baseTemplateProjectNames.collect {it + "-${branch}"} }.flatten()
+Set expectedBuilds = branches.values().collect {branchDisplayName -> baseTemplateProjectNames.collect {it + "-${branchDisplayName}"} }.flatten()
 Set buildsToDelete = currentBuilds - expectedBuilds - templateProjectNames
 println 'toDelete: ' + buildsToDelete
 
@@ -89,17 +90,17 @@ class JenkinsApi {
         response.data.text
     }
 
-    void copyJobAndSetBranch(String baseJobName, String branchName, String templateBranch, Set templateJobNames) {
+    void copyJobAndSetBranch(String baseJobName, String branchName, String branchDisplayName, String templateBranch, Set templateJobNames) {
         String config = getJobConfig("$baseJobName-$templateBranch")
         config = config.replaceAll(">origin/${templateBranch}<", ">origin/${branchName}<")
 
         templateJobNames.each {String templateJobName ->
             String baseName = templateJobName - templateBranch
-            config = config.replaceAll(templateJobName, "${baseName}${branchName}")
+            config = config.replaceAll(templateJobName, "${baseName}${branchDisplayName}")
         }
 
-        println("adding job $baseJobName-$branchName")
-        post('createItem', config, [name: "${baseJobName}-${branchName}"], ContentType.XML)
+        println("adding job $baseJobName-$branchDisplayName")
+        post('createItem', config, [name: "${baseJobName}-${branchDisplayName}"], ContentType.XML)
     }
 
     void deleteJob(String jobName) {
@@ -122,13 +123,13 @@ class JenkinsApi {
 
     List getViews() {
         println "getting views"
-        def response = restClient.get(path: 'api/json', query: [tree:'views[name,jobs[name]]'])
+        def response = restClient.get(path: 'api/json', query: [tree: 'views[name,jobs[name]]'])
         response.data.views
     }
 
     List getViewNames() {
         println "getting views"
-        def response = restClient.get(path: 'api/json', query: [tree:'views[name,jobs[name]]'])
+        def response = restClient.get(path: 'api/json', query: [tree: 'views[name,jobs[name]]'])
         response.data.views
     }
 
