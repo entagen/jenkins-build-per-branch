@@ -57,6 +57,13 @@ buildsToDelete.each {
     api.deleteJob(it)
 }
 
+// Delete views that don't have jobs
+api.getViews().each { view ->
+    if (!view.jobs) {
+        api.deleteView(view.name)
+    }
+}
+
 class JenkinsApi {
     String jenkinsServerUrl
     def restClient
@@ -107,6 +114,12 @@ class JenkinsApi {
         println "configuring view ${viewName}"
         post("view/${viewName}/configSubmit", body)
 
+    }
+
+    List getViews() {
+        println "getting views"
+        def response = restClient.get(path: 'api/json', query: [tree:'views[name,jobs[name]]'])
+        response.data.views
     }
 
     void deleteView(String viewName) {
