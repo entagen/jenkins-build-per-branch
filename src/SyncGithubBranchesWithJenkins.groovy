@@ -30,11 +30,18 @@ String branchesCommand = "git ls-remote --heads ${gitUrl}"
 Map<String, String> branches = [:]
 def process = branchesCommand.execute()
 process.waitFor()
-process.in.text.eachLine {String line ->
-    String branchName = line.substring(line.indexOf('refs/heads/')) - 'refs/heads/'
-    if (branchName != templateJobSuffix) {
-        branches[branchName] = branchName.replaceAll('/', '_')
+
+if (process.exitValue() == 0){
+    process.in.text.eachLine {String line ->
+        String branchName = line.substring(line.indexOf('refs/heads/')) - 'refs/heads/'
+        if (branchName != templateJobSuffix) {
+            branches[branchName] = branchName.replaceAll('/', '_')
+        }
     }
+} else {
+    println "error executing branches command: $branchesCommand"
+    println process.errorStream.text
+    return
 }
 
 List views = api.getViews()
