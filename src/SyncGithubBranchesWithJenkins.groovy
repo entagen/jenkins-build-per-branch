@@ -4,25 +4,26 @@ import static groovyx.net.http.ContentType.TEXT
 
 @Grab(group = 'org.codehaus.groovy.modules.http-builder', module = 'http-builder', version = '0.5.2')
 
-//TODO - parameter-ize these
-String templateJobPrefix = 'BuildTripleMap-'
-String templateJobSuffix = 'master'
-String gitUrl = 'git@github.com:entagen/triplemap.git'
+def cli = new CliBuilder(usage: "${getClass().getName()} [options]", header:'Options:')
+cli.p(longOpt:'job-prefix', args:1, argName:'jobPrefix', "Template Job Prefix")
+cli.s(longOpt:'job-suffix', args:1, argName:'jobSuffix', "Template Job Suffix")
+cli.u(longOpt:'git-url', args:1, argName:'gitUrl', "Git Repository URL")
+cli.b(longOpt:'base-name', args:1, argName:'baseName', "Base Name")
+cli.v(longOpt:'view-name', args:1, argName:'viewName', "View to add all new jobs")
+
+def options = cli.parse(args)
+
+String templateJobPrefix = options.p ?: 'BuildTripleMap'
+String templateJobSuffix = options.s ?: 'master'
+String gitUrl = options.u ?: 'git@github.com:entagen/triplemap.git'
+String baseName = options.b ?: 'TM'
+String customViewName = options.v ?: ''
 
 JenkinsApi api = new JenkinsApi('http://macallan:8081/')
 
-//delete all builds that are NOT master branch builds
-//Set currentBuilds = api.getProjectNames(templateJobPrefix)
-//Set templateProjectNames = currentBuilds.findAll { it.startsWith(templateJobPrefix) }
-//templateProjectNames.sort().each {
-//    if (!it.endsWith('-master')){
-//        api.deleteJob(it)
-//    }
-//}
+Set currentBuilds = api.getProjectNames(templateJobPrefix + '-')
 
-Set currentBuilds = api.getProjectNames(templateJobPrefix)
-
-Set templateProjectNames = currentBuilds.findAll { it.startsWith(templateJobPrefix) && it.endsWith('-' + templateJobSuffix) }
+Set templateProjectNames = currentBuilds.findAll { it.startsWith(templateJobPrefix + '-') && it.endsWith('-' + templateJobSuffix) }
 Set baseTemplateProjectNames = templateProjectNames.collect {(it.minus('-' + templateJobSuffix))}
 
 String branchesCommand = "git ls-remote --heads ${gitUrl}"
@@ -55,7 +56,6 @@ for (String branchName in branches.keySet()) {
         }
     }
 
-    String baseName = 'TM'
     if (!viewNames.contains("$baseName-$branchDisplayName".toString())) {
         api.createViewForBranch(baseName, branchDisplayName)
     }
@@ -121,21 +121,18 @@ class JenkinsApi {
         println "creating view ${viewName}"
         post('createView', body)
 
-        body = [useincluderegex: 'on', includeRegex: "BuildTripleMap*.*${branchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "BuildTripleMap*.*' + branchName + '"},' + VIEW_COLUMNS_JSON + '}']
+        body = [useincluderegex: 'on', includeRegex: "${templateJobPrefix}*.*${branchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + templateJobPrefix + '*.*' + branchName + '"},' + VIEW_COLUMNS_JSON + '}']
 
         println "configuring view ${viewName}"
         post("view/${viewName}/configSubmit", body)
 
     }
 
-    List getViews() {
-        println "getting views"
-        def response = restClient.get(path: 'api/json', query: [tree: 'views[name,jobs[name]]'])
-        response.data.views
+    void addBranchJobsToView(String viewName) {
+
     }
 
-    List getViewNames() {
-        println "getting views"
+    List getViews() {
         def response = restClient.get(path: 'api/json', query: [tree: 'views[name,jobs[name]]'])
         response.data.views
     }
