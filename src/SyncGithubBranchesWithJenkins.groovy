@@ -8,6 +8,7 @@ import static groovyx.net.http.ContentType.TEXT
 String templateJobPrefix = 'BuildTripleMap-'
 String templateJobSuffix = 'master'
 String gitUrl = 'git@github.com:entagen/triplemap.git'
+String baseName = 'TM'
 
 JenkinsApi api = new JenkinsApi('http://macallan:8081/')
 
@@ -55,7 +56,6 @@ for (String branchName in branches.keySet()) {
         }
     }
 
-    String baseName = 'TM'
     if (!viewNames.contains("$baseName-$branchDisplayName".toString())) {
         api.createViewForBranch(baseName, branchDisplayName)
     }
@@ -71,7 +71,8 @@ buildsToDelete.each {
 
 // Delete views that don't have jobs
 views.each { view ->
-    if (!view.jobs) {
+    boolean matchesBaseName = view.name.startsWith(baseName + "-")
+    if (!view.jobs && matchesBaseName) {
         api.deleteView(view.name)
     }
 }
