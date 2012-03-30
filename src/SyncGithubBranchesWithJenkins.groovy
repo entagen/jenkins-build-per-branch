@@ -4,15 +4,23 @@ import static groovyx.net.http.ContentType.TEXT
 
 @Grab(group = 'org.codehaus.groovy.modules.http-builder', module = 'http-builder', version = '0.5.2')
 
-def cli = new CliBuilder(usage: "${getClass().getName()} [options]", header:'Options:')
-cli.j(longOpt:'jenkins-url', args:1, argName:'jenkinsUrl', "Jenkins URL")
-cli.p(longOpt:'job-prefix', args:1, argName:'jobPrefix', "Template Job Prefix")
-cli.s(longOpt:'job-suffix', args:1, argName:'jobSuffix', "Template Job Suffix")
-cli.u(longOpt:'git-url', args:1, argName:'gitUrl', "Git Repository URL")
-cli.b(longOpt:'base-name', args:1, argName:'baseName', "Base Name - View Prefix")
-cli.v(longOpt:'use-nested-view', args:1, argName:'parentViewName', "Parent View Name")
+def cli = new CliBuilder(usage: "${getClass().getName()} [options]", header: 'Options:')
+cli.h(longOpt: 'help', "Usage information")
+cli.j(longOpt: 'jenkins-url', args: 1, argName: 'jenkinsUrl', "Jenkins URL")
+cli.p(longOpt: 'job-prefix', args: 1, argName: 'jobPrefix', "Template Job Prefix")
+cli.s(longOpt: 'job-suffix', args: 1, argName: 'jobSuffix', "Template Job Suffix")
+cli.u(longOpt: 'git-url', args: 1, argName: 'gitUrl', "Git Repository URL")
+cli.b(longOpt: 'base-name', args: 1, argName: 'baseName', "Base Name - View Prefix")
+cli.v(longOpt: 'use-nested-view', args: 1, argName: 'parentViewName', "Parent View Name")
+cli._(longOpt: 'disable-nested-view', "Disable Nested View Usage - (Jenkins Nested View plugin not installed)")
+cli.c(longOpt: 'check-config', "Check configuration - print out settings then exit")
 
 def options = cli.parse(args)
+
+if (options.h || options == null) {
+    cli.usage()
+    System.exit(0)
+}
 
 String templateJobPrefix = options.p ?: 'BuildTripleMap'
 String templateJobSuffix = options.s ?: 'master'
@@ -21,17 +29,24 @@ String baseName = options.b ?: 'TM'
 String parentViewName = options.v ?: 'TripleMap-feature-branches'
 String jenkinsUrl = options.j ?: 'http://macallan:8081/'
 
+if (options.'disable-nested-view') {
+    parentViewName = null
+}
+
+if (options.c) {
+    println "==============================================================="
+    println " templateJobPrefix: ${templateJobPrefix}"
+    println " templateJobSuffix: ${templateJobSuffix}"
+    println " gitUrl: ${gitUrl}"
+    println " baseName: ${baseName}"
+    println " parentViewName: ${parentViewName}"
+    println " jenkinsUrl: ${jenkinsUrl}"
+    println "==============================================================="
+    System.exit(0)
+}
+
+// Real work starts from here
 JenkinsApi api = new JenkinsApi(jenkinsUrl)
-
-println "==============================================================="
-println " templateJobPrefix: ${templateJobPrefix}"
-println " templateJobSuffix: ${templateJobSuffix}"
-println " gitUrl: ${gitUrl}"
-println " baseName: ${baseName}"
-println " parentViewName: ${parentViewName}"
-println " jenkinsUrl: ${jenkinsUrl}"
-println "==============================================================="
-
 
 Set currentBuilds = api.getProjectNames(templateJobPrefix + '-')
 
@@ -44,7 +59,7 @@ Map<String, String> branches = [:]
 def process = branchesCommand.execute()
 process.waitFor()
 
-if (process.exitValue() == 0){
+if (process.exitValue() == 0) {
     process.in.text.eachLine {String line ->
         String branchName = line.substring(line.indexOf('refs/heads/')) - 'refs/heads/'
         if (branchName != templateJobSuffix) {
@@ -137,7 +152,7 @@ class JenkinsApi {
         body = [useincluderegex: 'on', includeRegex: "${templateJobPrefix}*.*${branchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + templateJobPrefix + '*.*' + branchName + '"},' + VIEW_COLUMNS_JSON + '}']
 
         println "configuring view ${viewName}"
-        post("${buildViewPath(parentViewName,viewName)}/configSubmit", body)
+        post("${buildViewPath(parentViewName, viewName)}/configSubmit", body)
     }
 
     List getViews(String parentViewName = null) {
