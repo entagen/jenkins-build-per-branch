@@ -78,7 +78,7 @@ Set buildsToDelete = currentBuilds - expectedBuilds - templateProjectNames
 println 'toDelete: ' + buildsToDelete
 
 buildsToDelete.each {
-    api.deleteJob(it, parentViewName)
+    api.deleteJob(it)
 }
 
 // Delete views that don't have jobs
