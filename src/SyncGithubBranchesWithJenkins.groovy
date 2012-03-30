@@ -4,26 +4,38 @@ import static groovyx.net.http.ContentType.TEXT
 
 @Grab(group = 'org.codehaus.groovy.modules.http-builder', module = 'http-builder', version = '0.5.2')
 
-//TODO - parameter-ize these
-String templateJobPrefix = 'BuildTripleMap-'
-String templateJobSuffix = 'master'
-String gitUrl = 'git@github.com:entagen/triplemap.git'
-String baseName = 'TM'
+def cli = new CliBuilder(usage: "${getClass().getName()} [options]", header:'Options:')
+cli.j(longOpt:'jenkins-url', args:1, argName:'jenkinsUrl', "Jenkins URL")
+cli.p(longOpt:'job-prefix', args:1, argName:'jobPrefix', "Template Job Prefix")
+cli.s(longOpt:'job-suffix', args:1, argName:'jobSuffix', "Template Job Suffix")
+cli.u(longOpt:'git-url', args:1, argName:'gitUrl', "Git Repository URL")
+cli.b(longOpt:'base-name', args:1, argName:'baseName', "Base Name - View Prefix")
+cli.v(longOpt:'use-nested-view', args:1, argName:'parentViewName', "Parent View Name")
 
-JenkinsApi api = new JenkinsApi('http://macallan:8081/')
+def options = cli.parse(args)
 
-//delete all builds that are NOT master branch builds
-//Set currentBuilds = api.getProjectNames(templateJobPrefix)
-//Set templateProjectNames = currentBuilds.findAll { it.startsWith(templateJobPrefix) }
-//templateProjectNames.sort().each {
-//    if (!it.endsWith('-master')){
-//        api.deleteJob(it)
-//    }
-//}
+String templateJobPrefix = options.p ?: 'BuildTripleMap'
+String templateJobSuffix = options.s ?: 'master'
+String gitUrl = options.u ?: 'git@github.com:entagen/triplemap.git'
+String baseName = options.b ?: 'TM'
+String parentViewName = options.v ?: 'TripleMap-feature-branches'
+String jenkinsUrl = options.j ?: 'http://macallan:8081/'
 
-Set currentBuilds = api.getProjectNames(templateJobPrefix)
+JenkinsApi api = new JenkinsApi(jenkinsUrl)
 
-Set templateProjectNames = currentBuilds.findAll { it.startsWith(templateJobPrefix) && it.endsWith('-' + templateJobSuffix) }
+println "==============================================================="
+println " templateJobPrefix: ${templateJobPrefix}"
+println " templateJobSuffix: ${templateJobSuffix}"
+println " gitUrl: ${gitUrl}"
+println " baseName: ${baseName}"
+println " parentViewName: ${parentViewName}"
+println " jenkinsUrl: ${jenkinsUrl}"
+println "==============================================================="
+
+
+Set currentBuilds = api.getProjectNames(templateJobPrefix + '-')
+
+Set templateProjectNames = currentBuilds.findAll { it.startsWith(templateJobPrefix + '-') && it.endsWith('-' + templateJobSuffix) }
 Set baseTemplateProjectNames = templateProjectNames.collect {(it.minus('-' + templateJobSuffix))}
 
 String branchesCommand = "git ls-remote --heads ${gitUrl}"
@@ -45,7 +57,7 @@ if (process.exitValue() == 0){
     return
 }
 
-List views = api.getViews()
+List views = api.getViews(parentViewName)
 Set viewNames = views.collect {it.name}
 
 for (String branchName in branches.keySet()) {
@@ -57,7 +69,7 @@ for (String branchName in branches.keySet()) {
     }
 
     if (!viewNames.contains("$baseName-$branchDisplayName".toString())) {
-        api.createViewForBranch(baseName, branchDisplayName)
+        api.createViewForBranch(baseName, branchDisplayName, templateJobPrefix, parentViewName)
     }
 }
 
@@ -73,7 +85,7 @@ buildsToDelete.each {
 views.each { view ->
     boolean matchesBaseName = view.name.startsWith(baseName + "-")
     if (!view.jobs && matchesBaseName) {
-        api.deleteView(view.name)
+        api.deleteView(view.name, parentViewName)
     }
 }
 
@@ -116,34 +128,32 @@ class JenkinsApi {
         post("job/${jobName}/doDelete")
     }
 
-    void createViewForBranch(String baseName, String branchName) {
+    void createViewForBranch(String baseName, String branchName, String templateJobPrefix, String parentViewName = null) {
         String viewName = "$baseName-$branchName"
         Map body = [name: viewName, mode: 'hudson.model.ListView', Submit: 'OK', json: '{"name": "' + viewName + '", "mode": "hudson.model.ListView"}']
-        println "creating view ${viewName}"
-        post('createView', body)
+        println "creating view - viewName:${viewName},parentViewName:${parentViewName}"
+        post("${buildViewPath(parentViewName)}/createView", body)
 
-        body = [useincluderegex: 'on', includeRegex: "BuildTripleMap*.*${branchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "BuildTripleMap*.*' + branchName + '"},' + VIEW_COLUMNS_JSON + '}']
+        body = [useincluderegex: 'on', includeRegex: "${templateJobPrefix}*.*${branchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + templateJobPrefix + '*.*' + branchName + '"},' + VIEW_COLUMNS_JSON + '}']
 
         println "configuring view ${viewName}"
-        post("view/${viewName}/configSubmit", body)
-
+        post("${buildViewPath(parentViewName,viewName)}/configSubmit", body)
     }
 
-    List getViews() {
-        println "getting views"
-        def response = restClient.get(path: 'api/json', query: [tree: 'views[name,jobs[name]]'])
+    List getViews(String parentViewName = null) {
+        println "getting views - parentViewName:${parentViewName}"
+        def response = restClient.get(path: "${buildViewPath(parentViewName)}/api/json", query: [tree: 'views[name,jobs[name]]'])
         response.data.views
     }
 
-    List getViewNames() {
-        println "getting views"
-        def response = restClient.get(path: 'api/json', query: [tree: 'views[name,jobs[name]]'])
-        response.data.views
+    void deleteView(String viewName, String parentViewName = null) {
+        println "deleting view - viewName:${viewName},parentViewName:${parentViewName}"
+        post("${buildViewPath(parentViewName, viewName)}/doDelete")
     }
 
-    void deleteView(String viewName) {
-        println "deleting view"
-        post("view/${viewName}/doDelete")
+    private String buildViewPath(String... nestedViews) {
+        List elems = nestedViews.findAll()
+        elems.collect { "view/${it}" }.join('/')
     }
 
     /**
