@@ -50,7 +50,6 @@ if (process.exitValue() == 0){
 
 List views = api.getViews(parentViewName)
 Set viewNames = views.collect {it.name}
-println "viewNames: ${viewNames}"
 
 for (String branchName in branches.keySet()) {
     String branchDisplayName = branches[branchName]
@@ -77,7 +76,7 @@ buildsToDelete.each {
 views.each { view ->
     boolean matchesBaseName = view.name.startsWith(baseName + "-")
     if (!view.jobs && matchesBaseName) {
-        api.deleteView(view.name)
+        api.deleteView(view.name, parentViewName)
     }
 }
 
@@ -139,7 +138,7 @@ class JenkinsApi {
 
     void deleteView(String viewName, String parentViewName = null) {
         println "deleting view - viewName:${viewName},parentViewName:${parentViewName}"
-        post("${buildViewPath(viewName, parentViewName)}/doDelete")
+        post("${buildViewPath(parentViewName, viewName)}/doDelete")
     }
 
     private String buildViewPath(String... nestedViews) {
