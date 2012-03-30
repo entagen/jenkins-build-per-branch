@@ -21,8 +21,17 @@ String baseName = options.b ?: 'TM'
 String parentViewName = options.v ?: 'TripleMap-feature-branches'
 String jenkinsUrl = options.j ?: 'http://macallan:8081/'
 
-println "Using jenkins @ ${jenkinsUrl}"
 JenkinsApi api = new JenkinsApi(jenkinsUrl)
+
+println "==============================================================="
+println " templateJobPrefix: ${templateJobPrefix}"
+println " templateJobSuffix: ${templateJobSuffix}"
+println " gitUrl: ${gitUrl}"
+println " baseName: ${baseName}"
+println " parentViewName: ${parentViewName}"
+println " jenkinsUrl: ${jenkinsUrl}"
+println "==============================================================="
+
 
 Set currentBuilds = api.getProjectNames(templateJobPrefix + '-')
 
@@ -132,6 +141,7 @@ class JenkinsApi {
     }
 
     List getViews(String parentViewName = null) {
+        println "getting views - parentViewName:${parentViewName}"
         def response = restClient.get(path: "${buildViewPath(parentViewName)}/api/json", query: [tree: 'views[name,jobs[name]]'])
         response.data.views
     }
