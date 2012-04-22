@@ -52,17 +52,21 @@
             </p>
             <p>
                 You'll want to already have your template jobs running and passing (likely one or more jobs on the <code>master</code> branch of your repo).
-
+            </p>
+            <p>
                 Then, create a new Jenkins job called <code>SyncYOURPROJECTGitBranchesWithJenkins</code> as a "free-style software project".
-
+            </p>
+            <p>
                 Set the job to clone the <code>jenkins-build-per-branch</code> repo from github with the repository url <code>git@github.com:entagen/jenkins-build-per-branch.git</code>.
-
+            </p>
+            <p>
                 The branch to build should be set to <code>origin/master</code>.
-
+            </p>
+            <p>
                 Check the box to have it "build periodically" and set the cron expression to <code>*/5 * * * *</code> to get it building every 5 minutes.
-
+            </p>
+            <p>
                 Click on the "Add build step" dropdown and pick "Invoke Gradle script" from the dropdown.
-
             </p>
 
             <pre><code>-DjenkinsUrl=http://localhost:8080/ -DgitUrl=git@github.com:yourorg/myproject.git -DtemplateJobPrefix=MyProject -DtemplateBranchName=master -DbaseName=TM -DnestedView=TripleMap-feature-branches -DdryRun=true
