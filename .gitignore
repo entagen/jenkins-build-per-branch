@@ -1,0 +1,6 @@
+.gradle/
+build/
+jenkins-build-per-branch.iml
+jenkins-build-per-branch.ipr
+jenkins-build-per-branch.iws
+out/

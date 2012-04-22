@@ -1,126 +1,166 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Jenkins &quot;Build Per Branch&quot; by entagen</title>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="chrome=1">
+        <title>Jenkins &quot;Build Per Branch&quot; by entagen</title>
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <link rel="stylesheet" href="stylesheets/styles.css">
+        <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+        <script src="javascripts/scale.fix.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>Jenkins &quot;Build Per Branch&quot;</h1>
-        <p>Auto-create Jenkins build jobs for new feature branches</p>
-        <p class="view"><a href="https://github.com/entagen/jenkins-build-per-branch">View the Project on GitHub <small>entagen/jenkins-build-per-branch</small></a></p>
-        <ul>
-          <li><a href="https://github.com/entagen/jenkins-build-per-branch/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/entagen/jenkins-build-per-branch/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/entagen/jenkins-build-per-branch">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>Jenkins Build Per Branch</h1>
+        <!--[if lt IE 9]>
+        <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="wrapper">
+            <header>
+            <h1>Jenkins &quot;Build Per Branch&quot;</h1>
+            <p>Auto-create Jenkins build jobs for new feature branches</p>
+            <p class="view"><a href="https://github.com/entagen/jenkins-build-per-branch">View the Project on GitHub <small>entagen/jenkins-build-per-branch</small></a></p>
+            <ul>
+                <li><a href="https://github.com/entagen/jenkins-build-per-branch/zipball/master">Download <strong>ZIP File</strong></a></li>
+                <li><a href="https://github.com/entagen/jenkins-build-per-branch/tarball/master">Download <strong>TAR Ball</strong></a></li>
+                <li><a href="https://github.com/entagen/jenkins-build-per-branch">View On <strong>GitHub</strong></a></li>
+            </ul>
+            </header>
+            <section>
+            <h1>Jenkins Build Per Branch</h1>
 
-<p>The code in this repo lets you automatically generate Jenkins jobs for new branches in a specified repository, using templates to create the jobs.</p>
+            <p>The code in this repo lets you automatically generate Jenkins jobs for new branches in a specified repository, using templates to create the jobs.</p>
 
-<p>Using it is as easy as getting the set of jobs for your master branch working as you want them to.  Then create a new job that is in charge of creating new builds for each new branch in jenkins using the code in this repo.  That job monitors github for new branches that we don't already have jobs for.</p>
+            <p>Using it is as easy as getting the set of jobs for your master branch working as you want them to.  Then create a new job that is in charge of creating new builds for each new branch in jenkins using the code in this repo.  That job monitors github for new branches that we don't already have jobs for.</p>
 
-<p>It also automatically cleans up old feature branches that have been fully merged into another branch.</p>
+            <p>It also automatically cleans up old feature branches that have been fully merged into another branch.</p>
 
-<h2>Installation</h2>
+            <h2>Installation</h2>
 
-<p>It has the following plugin requirements in Jenkins:</p>
+            <p>It has the following plugin requirements in Jenkins:</p>
 
-<ul>
-<li>
-<a href="https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin">Jenkins Git Plugin</a> - currently called the "Jenkins GIT plugin" in the UI as of plugin version 1.1.17</li>
-<li>
-<a href="https://wiki.jenkins-ci.org/display/JENKINS/Groovy+plugin">Gradle Plugin</a> - currently called the "Hudson Groovy builder" in the UI as of plugin version 1.12</li>
-<li>the git command line app also must be installed (this is already a requirement of the Jenkins Git Plugin), and it must be configured with credentials (likely an SSH key) that has authorization rights to the git repository</li>
-</ul><h2>Conventions</h2>
+            <ul>
+                <li>
+                <a href="https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin">Jenkins Git Plugin</a> - currently called the "Jenkins GIT plugin" in the UI as of plugin version 1.1.17</li>
+                <li>
+                <a href="https://wiki.jenkins-ci.org/display/JENKINS/Groovy+plugin">Gradle Plugin</a> - currently called the "Hudson Groovy builder" in the UI as of plugin version 1.12</li>
+                <li>the git command line app also must be installed (this is already a requirement of the Jenkins Git Plugin), and it must be configured with credentials (likely an SSH key) that has authorization rights to the git repository</li>
+            </ul>
 
-<p>It is expected that there will be 1 or more "template" jobs that will be replicated for each new branch that is created.  In most workflows, this will likely be the jobs for the <code>master</code> branch.</p>
+            <p>
+                There are a few ways to use <code>jenkins-build-per-branch</code> but the easiest is probably to make a new Jenkins job that runs on a cron timer (every 5 minutes or so).
+            </p>
+            <p>
+                You'll want to already have your template jobs running and passing (likely one or more jobs on the <code>master</code> branch of your repo).
 
-<p>The job names are expected to be of the format:</p>
+                Then, create a new Jenkins job called <code>SyncYOURPROJECTGitBranchesWithJenkins</code> as a "free-style software project".
+
+                Set the job to clone the <code>jenkins-build-per-branch</code> repo from github with the repository url <code>git@github.com:entagen/jenkins-build-per-branch.git</code>.
+
+                The branch to build should be set to <code>origin/master</code>.
+
+                Check the box to have it "build periodically" and set the cron expression to <code>*/5 * * * *</code> to get it building every 5 minutes.
+
+                Click on the "Add build step" dropdown and pick "Invoke Gradle script" from the dropdown.
+
+            </p>
+
+            <pre><code>-DjenkinsUrl=http://localhost:8080/ -DgitUrl=git@github.com:yourorg/myproject.git -DtemplateJobPrefix=MyProject -DtemplateBranchName=master -DbaseName=TM -DnestedView=TripleMap-feature-branches -DdryRun=true
+            </code></pre>
+
+            <h3>Script System Parameter Details</h3>
+
+            <p>The following options are available in the script:</p>
+                <h1>TODO</h1>
+            <ul>
+                <li><code>-DjenkinsUrl</code></li>
+                <li><code>-DgitUrl</code></li>
+                <li><code>-DtemplateJobPrefix</code></li>
+                <li><code>-DtemplateBranchName</code></li>
+                <li><code>-DbaseName</code></li>
+                <li><code>-DnestedView</code></li>
+                <li><code>-DdryRun</code></li>
+            </ul>
+
+            <h2>Conventions</h2>
+
+            <p>It is expected that there will be 1 or more "template" jobs that will be replicated for each new branch that is created.  In most workflows, this will likely be the jobs for the <code>master</code> branch.</p>
+
+            <p>The job names are expected to be of the format:</p>
 
 <pre><code>&lt;templateJobPrefix&gt;-&lt;jobName&gt;-&lt;templateBranchName&gt;
 </code></pre>
 
-<p>Where:</p>
+            <p>Where:</p>
 
-<ul>
-<li>
-<code>templateJobPrefix</code> is probably the name of the git repository, ex: <code>myproject</code>
-</li>
-<li>
-<code>jobName</code> describes what Jenkins is actually doing with the job, ex: <code>runTests</code>
-</li>
-<li>
-<code>templateBranchName</code> is the branch that's being used as a template for the feature branch jobs, ex: <code>master</code>
-</li>
-</ul><p>So you could have 3 jobs that are dependent on each other to run, ex:</p>
+            <ul>
+                <li>
+                <code>templateJobPrefix</code> is probably the name of the git repository, ex: <code>myproject</code>
+                </li>
+                <li>
+                <code>jobName</code> describes what Jenkins is actually doing with the job, ex: <code>runTests</code>
+                </li>
+                <li>
+                <code>templateBranchName</code> is the branch that's being used as a template for the feature branch jobs, ex: <code>master</code>
+                </li>
+            </ul><p>So you could have 3 jobs that are dependent on each other to run, ex:</p>
 
-<ul>
-<li>MyProject-RunTests-master</li>
-<li>MyProject-BuildWar-master</li>
-<li>MyProject-DeployApp-master</li>
-</ul><p>If you created a new feature branch (ex: <code>newfeature</code>) and pushed it to the main git repo, it would create these jobs in Jenkins:</p>
+            <ul>
+                <li>MyProject-RunTests-master</li>
+                <li>MyProject-BuildWar-master</li>
+                <li>MyProject-DeployApp-master</li>
+            </ul><p>If you created a new feature branch (ex: <code>newfeature</code>) and pushed it to the main git repo, it would create these jobs in Jenkins:</p>
 
-<ul>
-<li>MyProject-RunTests-newfeature</li>
-<li>MyProject-BuildWar-newfeature</li>
-<li>MyProject-DeployApp-newfeature</li>
-</ul><p>Once <code>newfeature</code> was tested, accepted, and merged into master, the sync job would then delete those jobs on the next run.</p>
+            <ul>
+                <li>MyProject-RunTests-newfeature</li>
+                <li>MyProject-BuildWar-newfeature</li>
+                <li>MyProject-DeployApp-newfeature</li>
+            </ul>
+            <p>Once <code>newfeature</code> was tested, accepted, and merged into master, the sync job would then delete those jobs on the next run.</p>
 
-<h2>What Kinds of Worflows Need a Build Per Branch?</h2>
+            <h2>What Kinds of Worflows Need a Build Per Branch?</h2>
 
-<p>This can be very useful if your team is using a workflow like <a href="http://scottchacon.com/2011/08/31/github-flow.html">Github Flow</a>.</p>
+            <p>This can be very useful if your team is using a workflow like <a href="http://scottchacon.com/2011/08/31/github-flow.html">Github Flow</a>.</p>
 
-<p>In this workflow:</p>
+            <p>In this workflow:</p>
 
-<ul>
-<li>the <code>master</code> branch is always deployable</li>
-<li>New work is <em>always</em> done in a feature branch (i.e. <code>ted/my_fancy_feature</code>) and never committed directly to <code>master</code><br>
-</li>
-<li>When a feature is finished and ready, a pull request is made against master that is reviewed and tested by at least one other developer </li>
-<li>After a pull request is approved, the feature branch is merged to <code>master</code> and the feature branch is then deleted</li>
-<li>master should then be deployed as soon as possible</li>
-</ul><p>The advantages to this model are:</p>
+            <ul>
+                <li>the <code>master</code> branch is always deployable</li>
+                <li>New work is <em>always</em> done in a feature branch (i.e. <code>ted/my_fancy_feature</code>) and never committed directly to <code>master</code><br>
+                </li>
+                <li>When a feature is finished and ready, a pull request is made against master that is reviewed and tested by at least one other developer </li>
+                <li>After a pull request is approved, the feature branch is merged to <code>master</code> and the feature branch is then deleted</li>
+                <li>master should then be deployed as soon as possible</li>
+            </ul>
 
-<ul>
-<li>all code is seen (and tested) by at least one other person</li>
-<li>Feature branches are very short-lived (mostly a day or two) and rarely get out of date making the majority of merges trivial</li>
-<li>new features are quickly available to end users, and can be quickly fixed if there is some sort of issue</li>
-</ul><p>One disadvantage is that with multiple, short-lived branches, manually creating CI to confirm that all tests continue to pass becomes far too much overhead.  It must be automated for this model to work and be trusted.  "Jenkins Build Per Branch" is the answer to that problem.</p>
+            <p>The advantages to this model are:</p>
 
-<h2>Known Limitations</h2>
+            <ul>
+                <li>all code is seen (and tested) by at least one other person</li>
+                <li>Feature branches are very short-lived (mostly a day or two) and rarely get out of date making the majority of merges trivial</li>
+                <li>new features are quickly available to end users, and can be quickly fixed if there is some sort of issue</li>
+            </ul><p>One disadvantage is that with multiple, short-lived branches, manually creating CI to confirm that all tests continue to pass becomes far too much overhead.  It must be automated for this model to work and be trusted.  "Jenkins Build Per Branch" is the answer to that problem.</p>
 
-<p>The current version has these known limitations:</p>
+            <h2>Known Limitations</h2>
 
-<ul>
-<li>branches created from old code that don't fit the way the template currently works will fail.</li>
-<li>
-</ul><h2>Potential Future Enhancements</h2>
+            <p>The current version has these known limitations:</p>
 
-<ul>
-<li><p>allow a git repo to hold your job definitions, it would then be a submodule of the repo under test.  As the jenkins configuration changes to meet the needs of the repo under test, the job definition repo could be updated appropriately.  This would tie a particular SHA in the job definition repo to the current branch so Jenkins always has the right job definitions for building.</p></li>
-<li><p>make this into a plugin with a new jenkins "job type" that simplifies things down to the subset of what we actually want</p></li>
-</ul>
-      </section>
-    </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/entagen">entagen</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
-    
-  </body>
+            <ul>
+                <li>branches created from old code that don't fit the way the template currently works will fail.</li>
+                <li>
+            </ul><h2>Potential Future Enhancements</h2>
+
+            <ul>
+                <li><p>allow a git repo to hold your job definitions, it would then be a submodule of the repo under test.  As the jenkins configuration changes to meet the needs of the repo under test, the job definition repo could be updated appropriately.  This would tie a particular SHA in the job definition repo to the current branch so Jenkins always has the right job definitions for building.</p></li>
+                <li><p>make this into a plugin with a new jenkins "job type" that simplifies things down to the subset of what we actually want</p></li>
+            </ul>
+            </section>
+        </div>
+        <footer>
+        <p>Project maintained by <a href="https://github.com/entagen">entagen</a></p>
+        <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+        </footer>
+        <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+
+    </body>
 </html>
