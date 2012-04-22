@@ -29,7 +29,7 @@ idea {
 }
 
 
-task syncWithGit(dependsOn: 'classes', type: JavaExec) {
+task syncWithRepo(dependsOn: 'classes', type: JavaExec) {
     main = 'com.entagen.jenkins.Main'
     classpath = sourceSets.main.runtimeClasspath
     // pass through specified system properties to the call to main

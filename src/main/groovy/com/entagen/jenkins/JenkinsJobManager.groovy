@@ -20,7 +20,7 @@ class JenkinsJobManager {
         initGitApi()
     }
 
-    void syncWithGit() {
+    void syncWithRepo() {
         // get all current branch names from git (might have a '/' in them)
         List<String> allBranchNames = gitApi.branchNames
 
