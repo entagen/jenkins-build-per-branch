@@ -69,8 +69,17 @@
                 Click on the "Add build step" dropdown and pick "Invoke Gradle script" from the dropdown.
             </p>
 
+            <p>In the "Switches" box, enter the system parameters unique to your jenkins setup and git install, here's an example that you can use to tweak:</p>
             <pre><code>-DjenkinsUrl=http://localhost:8080/ -DgitUrl=git@github.com:yourorg/myproject.git -DtemplateJobPrefix=MyProject -DtemplateBranchName=master -DbaseName=TM -DnestedView=TripleMap-feature-branches -DdryRun=true
             </code></pre>
+
+            <p>Those switches include a <code>-DdryRun=true</code> system parameter so that the initial run does not change anything, it only logs out what it would do.</p>
+
+            <p>In the "Tasks" field, enter <code>syncWithRepo</code>.</p>
+
+            <p>Save the job and then "Build Now" to see if you've got things configured correctly.  Look at the output log to see what's happening.  If everything runs without exceptions, and it looks like it's creating the jobs you want, remove the <code>-DdryRun=true</code> flag and let it run for real.</code></p>
+
+            <p>This job is potentially destructive as it will delete old feature branch jobs for feature branches that no longer exist.  It's strongly recommended that you back up your jenkins jobs directory before running, just in case.</p>
 
             <h3>Script System Parameter Details</h3>
 
