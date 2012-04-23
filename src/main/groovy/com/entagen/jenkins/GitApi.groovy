@@ -8,7 +8,7 @@ class GitApi {
         List<String> branchNames = []
 
         eachResultLine(command) { String line ->
-            println "line: $line"
+            println "\t$line"
             // lines are in the format of: <SHA>\trefs/heads/BRANCH_NAME
             // ex: b9c209a2bf1c159168bf6bc2dfa9540da7e8c4a26\trefs/heads/master
             String branchNameRegex = "^.*\trefs/heads/(.*)\$"

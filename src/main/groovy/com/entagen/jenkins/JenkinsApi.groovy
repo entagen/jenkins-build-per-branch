@@ -32,17 +32,16 @@ class JenkinsApi {
         response.data.text
     }
 
-    void cloneJobForBranch(String baseJobName, String branchName, String branchDisplayName, String templateBranch, Set templateJobNames) {
-        String config = getJobConfig("$baseJobName-$templateBranch")
-        config = config.replaceAll(">origin/${templateBranch}<", ">origin/${branchName}<")
+    void cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
+        TemplateJob templateJob = missingJob.templateJob
+        String config = getJobConfig(templateJob.jobName)
+        config = config.replaceAll(">origin/${templateJob.templateBranchName}<", ">origin/${missingJob.branchName}<")
 
-        templateJobNames.each {String templateJobName ->
-            String baseName = templateJobName - templateBranch
-            config = config.replaceAll(templateJobName, "${baseName}${branchDisplayName}")
+        templateJobs.each {
+            config = config.replaceAll(it.jobName, it.jobNameForBranch(missingJob.branchName))
         }
 
-        println("adding job $baseJobName-$branchDisplayName")
-        post('createItem', config, [name: "${baseJobName}-${branchDisplayName}"], ContentType.XML)
+        post('createItem', config, [name: missingJob.jobName], ContentType.XML)
     }
 
     void deleteJob(String jobName) {
