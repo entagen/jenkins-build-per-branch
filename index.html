@@ -84,15 +84,14 @@
             <h3>Script System Parameter Details</h3>
 
             <p>The following options are available in the script:</p>
-                <h1>TODO</h1>
             <ul>
-                <li><code>-DjenkinsUrl</code></li>
-                <li><code>-DgitUrl</code></li>
-                <li><code>-DtemplateJobPrefix</code></li>
-                <li><code>-DtemplateBranchName</code></li>
-                <li><code>-DbaseName</code></li>
-                <li><code>-DnestedView</code></li>
-                <li><code>-DdryRun</code></li>
+                <li><code>-DjenkinsUrl</code> - ex: http://localhost:8080/jenkins/ - the url to the jenkins repo, you should be able to append <code>api/json</code> to the url to get a json feed</li>
+                <li><code>-DgitUrl</code> - ex: git@github.com:mycompany/myproject.git - the url to the git repo, read-only git url preferred</li>
+                <li><code>-DtemplateJobPrefix</code> - ex: myproj - the prefix that the template jobs (and all newly created jobs) will have, likely the project name</li>
+                <li><code>-DtemplateBranchName</code> - ex: master - the branch name with jobs in jenkins that's used as a template for all feature branches, this will be the suffix replaced for each branch</li>
+                <li><code>-DviewPrefix</code> - ex: MP (for my project) - a short suffix that will be used on all created views</li>
+                <li><code>-DnestedView</code> - ex: </li>
+                <li><code>-DdryRun</code> - ex: true - if this flag is passed with any value, it will not execute any changes only print out what would happen</li>
             </ul>
 
             <h2>Conventions</h2>
