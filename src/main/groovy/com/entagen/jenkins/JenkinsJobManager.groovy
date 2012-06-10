@@ -4,7 +4,6 @@ class JenkinsJobManager {
     String templateJobPrefix
     String templateBranchName
     String gitUrl
-    String baseName
     String nestedView
     String jenkinsUrl
     Boolean dryRun = false
@@ -29,6 +28,9 @@ class JenkinsJobManager {
 
         // create any missing template jobs and delete any jobs matching the template patterns that no longer have branches
         syncJobs(allBranchNames, allJobNames, templateJobs)
+
+        // create any missing branch views, scoped within a nested view if we were given one
+        syncViews(allBranchNames)
     }
 
     public void syncJobs(List<String> allBranchNames, List<String> allJobNames, List<TemplateJob> templateJobs) {
@@ -88,6 +90,33 @@ class JenkinsJobManager {
 
         assert templateJobs?.size() > 0, "Unable to find any jobs matching template regex: $regex\nYou need at least one job to match the templateJobPrefix and templateBranchName suffix arguments"
         return templateJobs
+    }
+
+    public void syncViews(List<String> allBranchNames) {
+        List<String> existingViewNames = jenkinsApi.getViewNames(this.nestedView)
+        List<BranchView> expectedBranchViews = allBranchNames.collect { String branchName -> new BranchView(branchName: branchName) }
+
+        List<BranchView> missingBranchViews = expectedBranchViews.findAll { BranchView branchView -> !existingViewNames.contains(branchView.viewName)}
+        addMissingViews(missingBranchViews)
+
+        List<String> deprecatedViewNames = existingViewNames - expectedBranchViews.viewName
+        deleteDeprecatedViews(deprecatedViewNames)
+    }
+
+    public void addMissingViews(List<BranchView> missingViews) {
+        println "Missing views: $missingViews"
+        for (BranchView missingView in missingViews) {
+            jenkinsApi.createViewForBranch(missingView)
+        }
+    }
+
+    public void deleteDeprecatedViews(List<String> deprecatedViewNames) {
+        println "Deprecated views: $deprecatedViewNames"
+
+        for(String deprecatedViewName in deprecatedViewNames) {
+            jenkinsApi.deleteView(deprecatedViewName)
+        }
+
     }
 
     JenkinsApi initJenkinsApi() {
