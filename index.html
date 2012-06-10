@@ -31,9 +31,14 @@
 
             <p>The code in this repo lets you automatically generate Jenkins jobs for new branches in a specified repository, using templates to create the jobs.</p>
 
-            <p>Using it is as easy as getting the set of jobs for your master branch working as you want them to.  Then create a new job that is in charge of creating new builds for each new branch in jenkins using the code in this repo.  That job monitors github for new branches that we don't already have jobs for.</p>
+            <p>Using it is as easy as:
+            <ul>
+                <li>Creating the set of jobs for your master branch that will be used as templates for feature branches, test them so that they work with master</li>
+                <li>Make a new job that is in charge of creating new builds for each branch in jenkins using the <code>jenkins-build-per-branch</code> code</li>
+            </ul>
+            </p>
 
-            <p>It also automatically cleans up old feature branches that have been fully merged into another branch.</p>
+            <p>This job will be in charge of both creating new jobs for new feature branches as well as cleaning up old feature branches that have been fully merged into another branch</p>
 
             <h2>Installation</h2>
 
@@ -45,6 +50,7 @@
                 <li>
                 <a href="https://wiki.jenkins-ci.org/display/JENKINS/Groovy+plugin">Gradle Plugin</a> - currently called the "Hudson Groovy builder" in the UI as of plugin version 1.12</li>
                 <li>the git command line app also must be installed (this is already a requirement of the Jenkins Git Plugin), and it must be configured with credentials (likely an SSH key) that has authorization rights to the git repository</li>
+                <li>Additional optional functionality for grouping your feature-branch builds is enabled if you have the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Nested+View+Plugin">Nested View Plugin</a> installed, but it is not required.</li>
             </ul>
 
             <p>
@@ -70,7 +76,7 @@
             </p>
 
             <p>In the "Switches" box, enter the system parameters unique to your jenkins setup and git install, here's an example that you can use to tweak:</p>
-            <pre><code>-DjenkinsUrl=http://localhost:8080/ -DgitUrl=git@github.com:yourorg/myproject.git -DtemplateJobPrefix=MyProject -DtemplateBranchName=master -DbaseName=TM -DnestedView=TripleMap-feature-branches -DdryRun=true
+            <pre><code>-DjenkinsUrl=http://localhost:8080/ -DgitUrl=git@github.com:yourorg/myproject.git -DtemplateJobPrefix=MyProject -DtemplateBranchName=master -DbaseName=TM -DnestedView=MyProject-feature-branches -DdryRun=true
             </code></pre>
 
             <p>Those switches include a <code>-DdryRun=true</code> system parameter so that the initial run does not change anything, it only logs out what it would do.</p>
