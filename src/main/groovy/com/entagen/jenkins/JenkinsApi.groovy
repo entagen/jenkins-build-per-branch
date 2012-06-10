@@ -49,28 +49,28 @@ class JenkinsApi {
         post("job/${jobName}/doDelete")
     }
 
-    void createViewForBranch(String baseName, String branchName, String templateJobPrefix, String parentViewName = null) {
-        String viewName = "$baseName-$branchName"
+    void createViewForBranch(BranchView branchView, String nestedWithinView = null) {
+        String viewName = branchView.viewName
         Map body = [name: viewName, mode: 'hudson.model.ListView', Submit: 'OK', json: '{"name": "' + viewName + '", "mode": "hudson.model.ListView"}']
-        println "creating view - viewName:${viewName},nestedView:${parentViewName}"
-        post("${buildViewPath(parentViewName)}/createView", body)
+        println "creating view - viewName:${viewName}, nestedView:${nestedWithinView}"
+        post("${buildViewPath(nestedWithinView)}/createView", body)
 
-        body = [useincluderegex: 'on', includeRegex: "${templateJobPrefix}*.*${branchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + templateJobPrefix + '*.*' + branchName + '"},' + VIEW_COLUMNS_JSON + '}']
-
+        body = [useincluderegex: 'on', includeRegex: "${branchView.templateJobPrefix}.*${branchView.branchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + branchView.templateJobPrefix + '.*' + branchView.branchName + '"},' + VIEW_COLUMNS_JSON + '}']
         println "configuring view ${viewName}"
-        post("${buildViewPath(parentViewName, viewName)}/configSubmit", body)
+        post("${buildViewPath(nestedWithinView, viewName)}/configSubmit", body)
     }
 
-    List getViews(String parentViewName = null) {
-        println "getting views - nestedView:${parentViewName}"
-        def response = get(path: "${buildViewPath(parentViewName)}/api/json", query: [tree: 'views[name,jobs[name]]'])
+    List<String> getViewNames(String nestedWithinView = null) {
+        println "getting views - nestedWithinView:${nestedWithinView}"
+        String path = "${buildViewPath(nestedWithinView)}/api/json"
+        def response = get(path: path, query: [tree: 'views[name,jobs[name]]'])
         // returns an array of views with a name and a list of jobs property
-        response.data.views
+        response.data?.views?.name
     }
 
-    void deleteView(String viewName, String parentViewName = null) {
-        println "deleting view - viewName:${viewName},nestedView:${parentViewName}"
-        post("${buildViewPath(parentViewName, viewName)}/doDelete")
+    void deleteView(String viewName, String nestedWithinView = null) {
+        println "deleting view - viewName:${viewName}, nestedView:${nestedWithinView}"
+        post("${buildViewPath(nestedWithinView, viewName)}/doDelete")
     }
 
     private String buildViewPath(String... nestedViews) {
