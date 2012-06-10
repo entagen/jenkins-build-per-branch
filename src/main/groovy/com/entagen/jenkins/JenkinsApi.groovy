@@ -53,36 +53,40 @@ class JenkinsApi {
         String viewName = branchView.viewName
         Map body = [name: viewName, mode: 'hudson.model.ListView', Submit: 'OK', json: '{"name": "' + viewName + '", "mode": "hudson.model.ListView"}']
         println "creating view - viewName:${viewName}, nestedView:${nestedWithinView}"
-        post("${buildViewPath(nestedWithinView)}/createView", body)
+        post(buildViewPath("createView", nestedWithinView), body)
 
-        body = [useincluderegex: 'on', includeRegex: "${branchView.templateJobPrefix}.*${branchView.branchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + branchView.templateJobPrefix + '.*' + branchView.branchName + '"},' + VIEW_COLUMNS_JSON + '}']
+        body = [useincluderegex: 'on', includeRegex: "${branchView.templateJobPrefix}.*${branchView.safeBranchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + branchView.templateJobPrefix + '.*' + branchView.safeBranchName + '"},' + VIEW_COLUMNS_JSON + '}']
         println "configuring view ${viewName}"
-        post("${buildViewPath(nestedWithinView, viewName)}/configSubmit", body)
+        post(buildViewPath("configSubmit", nestedWithinView, viewName), body)
     }
 
     List<String> getViewNames(String nestedWithinView = null) {
-        println "getting views - nestedWithinView:${nestedWithinView}"
-        String path = "${buildViewPath(nestedWithinView)}/api/json"
+        String path = buildViewPath("api/json", nestedWithinView)
+        println "getting views - nestedWithinView:${nestedWithinView} at path: $path"
         def response = get(path: path, query: [tree: 'views[name,jobs[name]]'])
-        // returns an array of views with a name and a list of jobs property
         response.data?.views?.name
     }
 
     void deleteView(String viewName, String nestedWithinView = null) {
         println "deleting view - viewName:${viewName}, nestedView:${nestedWithinView}"
-        post("${buildViewPath(nestedWithinView, viewName)}/doDelete")
+        post(buildViewPath("doDelete", nestedWithinView, viewName))
     }
 
-    private String buildViewPath(String... nestedViews) {
-        List elems = nestedViews.findAll()
-        elems.collect { "view/${it}" }.join('/')
+    protected String buildViewPath(String pathSuffix, String... nestedViews) {
+        List elems = nestedViews.findAll { it != null }
+        String viewPrefix = elems.collect { "view/${it}" }.join('/')
+
+        if (viewPrefix) return "$viewPrefix/$pathSuffix"
+
+        return pathSuffix
     }
 
-
-    protected get(map) {
+    protected get(Map map) {
+        // get is destructive to the map, if there's an error we want the values around still
+        Map mapCopy = map.clone() as Map
         def response
 
-        assert map.path != null, "'path' is a required attribute for the GET method"
+        assert mapCopy.path != null, "'path' is a required attribute for the GET method"
 
         try {
             response = restClient.get(map)
@@ -93,7 +97,7 @@ class JenkinsApi {
             println "Unknown host: $jenkinsServerUrl"
             throw ex
         } catch(HttpResponseException ex) {
-            def message = "Unexpected failure on $jenkinsServerUrl${map.path}, HTTP Status Code: ${ex.response?.status}"
+            def message = "Unexpected failure with path $jenkinsServerUrl${mapCopy.path}, HTTP Status Code: ${ex.response?.status}, full map: $mapCopy"
             throw new Exception(message, ex)
         }
 

@@ -94,27 +94,31 @@ class JenkinsJobManager {
 
     public void syncViews(List<String> allBranchNames) {
         List<String> existingViewNames = jenkinsApi.getViewNames(this.nestedView)
-        List<BranchView> expectedBranchViews = allBranchNames.collect { String branchName -> new BranchView(branchName: branchName) }
+        List<BranchView> expectedBranchViews = allBranchNames.collect { String branchName -> new BranchView(branchName: branchName, templateJobPrefix: this.templateJobPrefix) }
 
         List<BranchView> missingBranchViews = expectedBranchViews.findAll { BranchView branchView -> !existingViewNames.contains(branchView.viewName)}
         addMissingViews(missingBranchViews)
 
-        List<String> deprecatedViewNames = existingViewNames - expectedBranchViews.viewName
+        List<String> deprecatedViewNames = getDeprecatedViewNames(existingViewNames, expectedBranchViews)
         deleteDeprecatedViews(deprecatedViewNames)
     }
 
     public void addMissingViews(List<BranchView> missingViews) {
         println "Missing views: $missingViews"
         for (BranchView missingView in missingViews) {
-            jenkinsApi.createViewForBranch(missingView)
+            jenkinsApi.createViewForBranch(missingView, this.nestedView)
         }
+    }
+
+    public List<String> getDeprecatedViewNames(List<String> existingViewNames, List<BranchView> expectedBranchViews) {
+         return existingViewNames?.findAll { it.startsWith(this.templateJobPrefix) } - expectedBranchViews?.viewName ?: []
     }
 
     public void deleteDeprecatedViews(List<String> deprecatedViewNames) {
         println "Deprecated views: $deprecatedViewNames"
 
         for(String deprecatedViewName in deprecatedViewNames) {
-            jenkinsApi.deleteView(deprecatedViewName)
+            jenkinsApi.deleteView(deprecatedViewName, this.nestedView)
         }
 
     }

@@ -5,8 +5,13 @@ class BranchView {
     String branchName
 
     public String getViewName() {
-        return "$templateJobPrefix-$branchName"
+        return "$templateJobPrefix-$safeBranchName"
     }
+
+    public String getSafeBranchName() {
+        return branchName.replaceAll('/', '_')
+    }
+
 
     public String toString() {
         return this.viewName
