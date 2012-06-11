@@ -76,16 +76,16 @@
             </p>
 
             <p>In the "Switches" box, enter the system parameters unique to your jenkins setup and git install, here's an example that you can use to tweak:</p>
-            <pre><code>-DjenkinsUrl=http://localhost:8080/ -DgitUrl=git@github.com:yourorg/myproject.git -DtemplateJobPrefix=MyProject -DtemplateBranchName=master -DnestedView=MyProject-feature-branches -DdryRun=true
+            <pre><code>-DjenkinsUrl=http://localhost:8080/jenkins -DgitUrl=git@github.com:mygithandle/myproject.git -DtemplateJobPrefix=MyProject -DtemplateBranchName=master -DnestedView=MyProject-branches -DdryRun=true
             </code></pre>
 
             <p>Those switches include a <code>-DdryRun=true</code> system parameter so that the initial run does not change anything, it only logs out what it would do.</p>
 
             <p>In the "Tasks" field, enter <code>syncWithRepo</code>.</p>
 
-            <p>Save the job and then "Build Now" to see if you've got things configured correctly.  Look at the output log to see what's happening.  If everything runs without exceptions, and it looks like it's creating the jobs you want, remove the <code>-DdryRun=true</code> flag and let it run for real.</code></p>
+            <p>Save the job and then "Build Now" to see if you've got things configured correctly.  Look at the output log to see what's happening.  If everything runs without exceptions, and it looks like it's creating the jobs and views you want, remove the <code>-DdryRun=true</code> flag and let it run for real.</code></p>
 
-            <p>This job is potentially destructive as it will delete old feature branch jobs for feature branches that no longer exist.  It's strongly recommended that you back up your jenkins jobs directory before running, just in case.</p>
+        <p>This job is potentially destructive as it will delete old feature branch jobs for feature branches that no longer exist.  It's strongly recommended that you back up your jenkins <code>jobs</code> directory before running, just in case.  Another good alternative would be to put your <code>jobs</code> directory under git version control.  Ignore <code>workspace</code> and <code>builds</code> directories and just about everything can be added.  Commit periodocally and if something bad happens, revert back to the last known good version.</p>
 
             <h3>Script System Parameter Details</h3>
 
@@ -95,7 +95,7 @@
                 <li><code>-DgitUrl</code> - ex: git@github.com:mycompany/myproject.git - the url to the git repo, read-only git url preferred</li>
                 <li><code>-DtemplateJobPrefix</code> - ex: myproj - the prefix that the template jobs (and all newly created jobs) will have, likely the project name</li>
                 <li><code>-DtemplateBranchName</code> - ex: master - the branch name with jobs in jenkins that's used as a template for all feature branches, this will be the suffix replaced for each branch</li>
-                <li><code>-DnestedView</code> - ex: MyProject-feature-branches - optional - the name of the existing nested view that will hold a view per feature branch, reqires the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Nested+View+Plugin">Nested View</a> plugin to be installed. This is useful to avoid an explosion of tabs in Jenkin's UI</li>
+                <li><code>-DnestedView</code> - ex: MyProject-feature-branches - optional - the name of the existing nested view that will hold a view per feature branch, reqires the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Nested+View+Plugin">Nested View</a> plugin to be installed. This is useful to avoid an explosion of tabs in Jenkin's UI. Without this parameter, each branch will get it's jobs in it's own tab at the top.</li>
                 <li><code>-DdryRun</code> - ex: true - if this flag is passed with any value, it will not execute any changes only print out what would happen</li>
             </ul>
 
