@@ -93,7 +93,7 @@
             <ul>
                 <li><code>-DjenkinsUrl</code> - ex: http://localhost:8080/jenkins/ - the url to the jenkins repo, you should be able to append <code>api/json</code> to the url to get a json feed</li>
                 <li><code>-DgitUrl</code> - ex: git@github.com:mycompany/myproject.git - the url to the git repo, read-only git url preferred</li>
-                <li><code>-DtemplateJobPrefix</code> - ex: myproj - the prefix that the template jobs (and all newly created jobs) will have, likely the project name</li>
+                <li><code>-DtemplateJobPrefix</code> - ex: myproj - the prefix that the template jobs (and all newly created jobs) will have, likely the project name, the view containing all of the branch's jobs will also use this prefix.</li>
                 <li><code>-DtemplateBranchName</code> - ex: master - the branch name with jobs in jenkins that's used as a template for all feature branches, this will be the suffix replaced for each branch</li>
                 <li><code>-DnestedView</code> - ex: MyProject-feature-branches - optional - the name of the existing nested view that will hold a view per feature branch, reqires the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Nested+View+Plugin">Nested View</a> plugin to be installed. This is useful to avoid an explosion of tabs in Jenkin's UI. Without this parameter, each branch will get it's jobs in it's own tab at the top.</li>
                 <li><code>-DdryRun</code> - ex: true - if this flag is passed with any value, it will not execute any changes only print out what would happen</li>
@@ -133,7 +133,10 @@
                 <li>MyProject-BuildWar-newfeature</li>
                 <li>MyProject-DeployApp-newfeature</li>
             </ul>
-            <p>Once <code>newfeature</code> was tested, accepted, and merged into master, the sync job would then delete those jobs on the next run.</p>
+
+            <p>It will also create a new view for the branch to contain all 3 of those jobs called "MyProject-newfeature".  If you haven't used the <code>nestedView</code> parameter, it will be a new tab at the top of the main screen, otherwise it will be contained within that view.</p>
+
+            <p>Once <code>newfeature</code> was tested, accepted, and merged into master, the sync job would then delete those jobs and it's view on the next run.</p>
 
             <h2>What Kinds of Worflows Need a Build Per Branch?</h2>
 
