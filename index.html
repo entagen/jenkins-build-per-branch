@@ -38,7 +38,7 @@
             </ul>
             </p>
 
-            <p>This job will be in charge of both creating new jobs for new feature branches as well as cleaning up old feature branches that have been fully merged into another branch</p>
+            <p>This job will be in charge of both creating new jobs for new feature branches as well as cleaning up old feature branch jobs that have been fully merged into another branch</p>
 
             <h2>Installation</h2>
 
@@ -46,9 +46,9 @@
 
             <ul>
                 <li>
-                <a href="https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin">Jenkins Git Plugin</a> - currently called the "Jenkins GIT plugin" in the UI as of plugin version 1.1.17</li>
+                <a href="https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin">Jenkins Git Plugin</a></li>
                 <li>
-                <a href="https://wiki.jenkins-ci.org/display/JENKINS/Groovy+plugin">Gradle Plugin</a> - currently called the "Hudson Groovy builder" in the UI as of plugin version 1.12</li>
+                <a href="http://wiki.jenkins-ci.org/display/JENKINS/Gradle+Plugin">Jenkins Gradle plugin</a>/li>
                 <li>the git command line app also must be installed (this is already a requirement of the Jenkins Git Plugin), and it must be configured with credentials (likely an SSH key) that has authorization rights to the git repository</li>
                 <li>Additional optional functionality for grouping your feature-branch builds is enabled if you have the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Nested+View+Plugin">Nested View Plugin</a> installed, but it is not required.</li>
             </ul>
@@ -112,7 +112,7 @@
 
             <ul>
                 <li>
-                <code>templateJobPrefix</code> is probably the name of the git repository, ex: <code>myproject</code>
+                <code>templateJobPrefix</code> is probably the name of the git repository, ex: <code>MyProject</code>
                 </li>
                 <li>
                 <code>jobName</code> describes what Jenkins is actually doing with the job, ex: <code>runTests</code>
@@ -161,18 +161,12 @@
                 <li>new features are quickly available to end users, and can be quickly fixed if there is some sort of issue</li>
             </ul><p>One disadvantage is that with multiple, short-lived branches, manually creating CI to confirm that all tests continue to pass becomes far too much overhead.  It must be automated for this model to work and be trusted.  "Jenkins Build Per Branch" is the answer to that problem.</p>
 
-            <h2>Known Limitations</h2>
-
-            <p>The current version has these known limitations:</p>
-
-            <ul>
-                <li>branches created from old code that don't fit the way the template currently works will fail.</li>
-                <li>
-            </ul><h2>Potential Future Enhancements</h2>
+<h2>Potential Future Enhancements</h2>
 
             <ul>
                 <li><p>allow a git repo to hold your job definitions, it would then be a submodule of the repo under test.  As the jenkins configuration changes to meet the needs of the repo under test, the job definition repo could be updated appropriately.  This would tie a particular SHA in the job definition repo to the current branch so Jenkins always has the right job definitions for building.</p></li>
-                <li><p>make this into a plugin with a new jenkins "job type" that simplifies things down to the subset of what we actually want</p></li>
+                <li><p>make this into a plugin with a new jenkins "job type" or "build step" that simplifies things down to filling in a set of form fields</p></li>
+                <li><p>enable username/password authentication for scripts to run against protected Jenkins instances</p></li>
             </ul>
             </section>
         </div>
