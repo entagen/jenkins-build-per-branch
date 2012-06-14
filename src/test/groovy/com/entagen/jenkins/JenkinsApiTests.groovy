@@ -34,7 +34,7 @@ class JenkinsApiTests extends GroovyTestCase {
 
         mockRESTClient.use {
             JenkinsApi api = new JenkinsApi(jenkinsServerUrl: "http://localhost:9090/goodHostAndPortBadUrl")
-            assert "Unexpected failure on http://localhost:9090/goodHostAndPortBadUrl/api/json, HTTP Status Code: 404" == shouldFail() {
+            assert "Unexpected failure with path http://localhost:9090/goodHostAndPortBadUrl/api/json, HTTP Status Code: 404, full map: [path:api/json]" == shouldFail() {
                 api.getJobNames("myproj")
             }
         }
