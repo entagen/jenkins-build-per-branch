@@ -70,6 +70,28 @@ class JenkinsApiTests extends GroovyTestCase {
         }
     }
 
+    @Test public void testConfigForMissingJob_worksWithRemote() {
+        JenkinsApi api = new JenkinsApi()
+        api.metaClass.getJobConfig = { String jobName ->
+            "<name>origin/master</name>"
+        }
+
+        TemplateJob templateJob = new TemplateJob(templateBranchName: "master")
+        ConcreteJob missingJob = new ConcreteJob(branchName: "new/branch", templateJob: templateJob)
+        assert "<name>origin/new/branch</name>" == api.configForMissingJob(missingJob, [])
+    }
+
+    @Test public void testConfigForMissingJob_worksWithoutRemote() {
+        JenkinsApi api = new JenkinsApi()
+        api.metaClass.getJobConfig = { String jobName ->
+            "<name>master</name>"
+        }
+
+        TemplateJob templateJob = new TemplateJob(templateBranchName: "master")
+        ConcreteJob missingJob = new ConcreteJob(branchName: "new/branch", templateJob: templateJob)
+        assert "<name>new/branch</name>" == api.configForMissingJob(missingJob, [])
+    }
+
     public void withJsonResponse(Map toJson, Closure closure) {
         JSON json = toJson as JSONObject
         MockFor mockRESTClient = new MockFor(RESTClient)
