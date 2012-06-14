@@ -33,15 +33,24 @@ class JenkinsApi {
     }
 
     void cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
+        String missingJobConfig = configForMissingJob(missingJob, templateJobs)
+        post('createItem', missingJobConfig, [name: missingJob.jobName], ContentType.XML)
+    }
+
+    String configForMissingJob(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
         TemplateJob templateJob = missingJob.templateJob
         String config = getJobConfig(templateJob.jobName)
-        config = config.replaceAll(">origin/${templateJob.templateBranchName}<", ">origin/${missingJob.branchName}<")
+        // should work if there's a remote ("origin/master") or no remote (just "master")
+        config = config.replaceAll("([>/])(${templateJob.templateBranchName})<") { fullMatch, prefix, branchName ->
+            return "$prefix${missingJob.branchName}<"
+        }
 
+        // this is in case there are other down-stream jobs that this job calls, we want to be sure we're replacing their names as well
         templateJobs.each {
             config = config.replaceAll(it.jobName, it.jobNameForBranch(missingJob.branchName))
         }
 
-        post('createItem', config, [name: missingJob.jobName], ContentType.XML)
+        return config
     }
 
     void deleteJob(String jobName) {
