@@ -33,7 +33,7 @@ task syncWithRepo(dependsOn: 'classes', type: JavaExec) {
     main = 'com.entagen.jenkins.Main'
     classpath = sourceSets.main.runtimeClasspath
     // pass through specified system properties to the call to main
-    ['help', 'jenkinsUrl', 'gitUrl', 'templateJobPrefix', 'templateBranchName', 'nestedView', 'printConfig', 'dryRun'].each {
+    ['help', 'jenkinsUrl', 'gitUrl', 'templateJobPrefix', 'templateBranchName', 'nestedView', 'printConfig', 'dryRun', 'branchNameRegex'].each {
         if (System.getProperty(it)) systemProperty it, System.getProperty(it)
     }
 
