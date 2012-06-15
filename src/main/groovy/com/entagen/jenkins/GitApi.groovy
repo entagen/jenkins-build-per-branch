@@ -1,7 +1,10 @@
 package com.entagen.jenkins
 
+import java.util.regex.Pattern
+
 class GitApi {
     String gitUrl
+    Pattern branchNameFilter = ~/.+/
 
     public List<String> getBranchNames() {
         String command = "git ls-remote --heads ${gitUrl}"
@@ -13,7 +16,7 @@ class GitApi {
             // ex: b9c209a2bf1c159168bf6bc2dfa9540da7e8c4a26\trefs/heads/master
             String branchNameRegex = "^.*\trefs/heads/(.*)\$"
             String branchName = line.find(branchNameRegex) { full, branchName -> branchName }
-            if (branchName) branchNames << branchName
+            if (branchName && branchNameFilter.matcher(branchName).matches()) branchNames << branchName
         }
 
         return branchNames

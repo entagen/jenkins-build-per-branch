@@ -37,6 +37,22 @@ garbage line that should be ignored
         assert ["master", "release_1.0rc1", "ted/feature_branch"] == branchNames.sort()
     }
 
+    @Test public void testGetFilteredBranchNames() {
+        String mockResult = """
+10b42258f451ebf2640d3c18850e0c22eecdad4\trefs/heads/feature/myfeature
+b9c209a2bf1c159168bf6bc2dfa9540da7e8c4a26\trefs/heads/master
+abd856d2ae658ee5f14889b465f3adcaf65fb52b\trefs/heads/release/1.0rc1
+abd856d2ae658ee5f14889b465f3adcaf65fb52b\trefs/heads/other_branch
+        """.trim()
+
+        GitApi gitApi = new GitApiMockedResult(mockResult: mockResult)
+
+        gitApi.branchNameFilter = ~/feature\/.+|release\/.+|master/
+        List<String> branchNames = gitApi.branchNames
+
+        assert ["feature/myfeature", "master", "release/1.0rc1"] == branchNames.sort()
+    }
+
 }
 
 

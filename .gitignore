@@ -5,4 +5,5 @@
 build
 .gradle
 
-out/
+out/atlassian-ide-plugin.xml
+atlassian-ide-plugin.xml
