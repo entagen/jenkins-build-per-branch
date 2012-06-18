@@ -14,6 +14,7 @@ import org.apache.http.HttpRequest
 class JenkinsApi {
     String jenkinsServerUrl
     RESTClient restClient
+    HttpRequestInterceptor requestInterceptor
 
     public JenkinsApi(String jenkinsServerUrl, String jenkinsServerUser, String jenkinsServerPassword) {
         if (!jenkinsServerUrl.endsWith("/")) {
@@ -25,12 +26,14 @@ class JenkinsApi {
         if (null != jenkinsServerUser && null != jenkinsServerPassword) {
             println "use basic authentication"
 
-            this.restClient.client.addRequestInterceptor(new HttpRequestInterceptor() {
+            this.requestInterceptor = new HttpRequestInterceptor() {
                 void process(HttpRequest httpRequest, HttpContext httpContext) {
                     def auth = jenkinsServerUser + ':' + jenkinsServerPassword
                     httpRequest.addHeader('Authorization', 'Basic ' + auth.bytes.encodeBase64().toString())
                 }
-            })
+            }
+
+            this.restClient.client.addRequestInterceptor(this.requestInterceptor)
         }
     }
 
@@ -137,6 +140,11 @@ class JenkinsApi {
      */
     protected Integer post(String path, postBody = [:], params = [:], ContentType contentType = ContentType.URLENC) {
         HTTPBuilder http = new HTTPBuilder(jenkinsServerUrl)
+
+        if (requestInterceptor) {
+            http.client.addRequestInterceptor(this.requestInterceptor)
+        }
+
         Integer status = HttpStatus.SC_EXPECTATION_FAILED
 
         http.handler.failure = { resp ->
