@@ -1,11 +1,15 @@
 package com.entagen.jenkins
 
+import java.util.regex.Pattern
+
 class JenkinsJobManager {
     String templateJobPrefix
     String templateBranchName
     String gitUrl
     String nestedView
     String jenkinsUrl
+    String branchNameRegex
+
     Boolean dryRun = false
 
     JenkinsApi jenkinsApi
@@ -141,6 +145,7 @@ class JenkinsJobManager {
         if (!gitApi) {
             assert gitUrl != null
             this.gitApi = new GitApi(gitUrl: gitUrl)
+            gitApi.branchNameFilter = Pattern.compile(this.branchNameRegex)
         }
 
         return this.gitApi

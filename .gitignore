@@ -2,7 +2,9 @@
 *.iml
 *.ipr
 *.iws
+*.diff
 build
 .gradle
 
-out/
+out
+atlassian-ide-plugin.xml
