@@ -7,15 +7,31 @@ import static groovyx.net.http.ContentType.*
 import org.apache.http.conn.HttpHostConnectException
 import org.apache.http.client.HttpResponseException
 import org.apache.http.HttpStatus
+import org.apache.http.HttpRequestInterceptor
+import org.apache.http.protocol.HttpContext
+import org.apache.http.HttpRequest
 
 class JenkinsApi {
     String jenkinsServerUrl
     RESTClient restClient
 
-    public void setJenkinsServerUrl(String jenkinsServerUrl) {
-        if (!jenkinsServerUrl.endsWith("/")) jenkinsServerUrl += "/"
+    public JenkinsApi(String jenkinsServerUrl, String jenkinsServerUser, String jenkinsServerPassword) {
+        if (!jenkinsServerUrl.endsWith("/")) {
+            jenkinsServerUrl += "/"
+        }
         this.jenkinsServerUrl = jenkinsServerUrl
         this.restClient = new RESTClient(jenkinsServerUrl)
+
+        if (null != jenkinsServerUser && null != jenkinsServerPassword) {
+            println "use basic authentication"
+
+            this.restClient.client.addRequestInterceptor(new HttpRequestInterceptor() {
+                void process(HttpRequest httpRequest, HttpContext httpContext) {
+                    def auth = jenkinsServerUser + ':' + jenkinsServerPassword
+                    httpRequest.addHeader('Authorization', 'Basic ' + auth.bytes.encodeBase64().toString())
+                }
+            })
+        }
     }
 
     List<String> getJobNames(String prefix = null) {
