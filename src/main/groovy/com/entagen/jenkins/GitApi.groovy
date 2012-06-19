@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 class GitApi {
     String gitUrl
-    Pattern branchNameFilter = ~/.+/
+    Pattern branchNameFilter = null
 
     public List<String> getBranchNames() {
         String command = "git ls-remote --heads ${gitUrl}"
@@ -16,10 +16,16 @@ class GitApi {
             // ex: b9c209a2bf1c159168bf6bc2dfa9540da7e8c4a26\trefs/heads/master
             String branchNameRegex = "^.*\trefs/heads/(.*)\$"
             String branchName = line.find(branchNameRegex) { full, branchName -> branchName }
-            if (branchName && branchNameFilter.matcher(branchName).matches()) branchNames << branchName
+            if (passesFilter(branchName)) branchNames << branchName
         }
 
         return branchNames
+    }
+
+    public Boolean passesFilter(String branchName) {
+        if (!branchName) return false
+        if (!branchNameFilter) return true
+        return branchName ==~ branchNameFilter
     }
 
     // assumes all commands are "safe", if we implement any destructive git commands, we'd want to separate those out for a dry-run
