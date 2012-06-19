@@ -11,10 +11,6 @@ import org.apache.http.HttpStatus
 
 class JenkinsApiReadOnly extends JenkinsApi {
 
-    public JenkinsApiReadOnly(String jenkinsServerUrl, String jenkinsServerUser, String jenkinsServerPassword) {
-        super(jenkinsServerUrl, jenkinsServerUser, jenkinsServerPassword)
-    }
-
     @Override
     protected Integer post(String path, postBody = [:], params = [:], ContentType contentType = ContentType.URLENC) {
         println "READ ONLY! skipping POST to $path with params: ${params}, postBody:\n$postBody"
