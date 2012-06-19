@@ -92,9 +92,12 @@
             <p>The following options are available in the script:</p>
             <ul>
                 <li><code>-DjenkinsUrl</code> - ex: http://localhost:8080/jenkins/ - the url to the jenkins repo, you should be able to append <code>api/json</code> to the url to get a json feed</li>
+                <li><code>-DjenkinsUser</code> - ex: admin - the username for Jenkins HTTP basic auth - optional</li>
+                <li><code>-DjenkinsPassword</code> - ex: sekr1t - the password for Jenkins HTTP basic auth - optional</li>
                 <li><code>-DgitUrl</code> - ex: git@github.com:mycompany/myproject.git - the url to the git repo, read-only git url preferred</li>
                 <li><code>-DtemplateJobPrefix</code> - ex: myproj - the prefix that the template jobs (and all newly created jobs) will have, likely the project name, the view containing all of the branch's jobs will also use this prefix.</li>
                 <li><code>-DtemplateBranchName</code> - ex: master - the branch name with jobs in jenkins that's used as a template for all feature branches, this will be the suffix replaced for each branch</li>
+                <li><code>-DbranchNameRegex</code> - ex: feature\/.+|release\/.+|master - only branches matching the regex will be accepted (your <code>templateBranchName</code> must pass this regex if given!) - optional</li>
                 <li><code>-DnestedView</code> - ex: MyProject-feature-branches - optional - the name of the existing nested view that will hold a view per feature branch, reqires the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Nested+View+Plugin">Nested View</a> plugin to be installed. This is useful to avoid an explosion of tabs in Jenkin's UI. Without this parameter, each branch will get it's jobs in it's own tab at the top.</li>
                 <li><code>-DdryRun</code> - ex: true - if this flag is passed with any value, it will not execute any changes only print out what would happen</li>
             </ul>
@@ -166,7 +169,7 @@
             <ul>
                 <li><p>allow a git repo to hold your job definitions, it would then be a submodule of the repo under test.  As the jenkins configuration changes to meet the needs of the repo under test, the job definition repo could be updated appropriately.  This would tie a particular SHA in the job definition repo to the current branch so Jenkins always has the right job definitions for building.</p></li>
                 <li><p>make this into a plugin with a new jenkins "job type" or "build step" that simplifies things down to filling in a set of form fields</p></li>
-                <li><p>enable username/password authentication for scripts to run against protected Jenkins instances</p></li>
+                <li><p>Support token-based authentication in addition to the basic auth support it already has</p></li>
             </ul>
             </section>
         </div>
