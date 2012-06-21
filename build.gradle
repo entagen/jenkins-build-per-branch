@@ -39,6 +39,9 @@ task syncWithRepo(dependsOn: 'classes', type: JavaExec) {
 
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.0'
+}
 
 
 
