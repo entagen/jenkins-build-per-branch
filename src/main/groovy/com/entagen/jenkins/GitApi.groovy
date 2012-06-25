@@ -39,8 +39,10 @@ class GitApi {
                 closure(line)
             }
         } else {
+            String errorText = process.errorStream.text?.trim()
             println "error executing command: $command"
-            println process.errorStream.text
+            println errorText
+            throw new Exception("Error executing command: $command -> $errorText")
         }
     }
 

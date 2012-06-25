@@ -22,6 +22,16 @@ class GitApiTests extends GroovyTestCase {
         }
     }
 
+    @Test public void testBadCommandThrowsException() {
+        GitApi gitApi = new GitApi()
+
+        assert "Error executing command: cat thisfiledoesntexist -> cat: thisfiledoesntexist: No such file or directory" == shouldFail {
+            gitApi.eachResultLine("cat thisfiledoesntexist") { String line ->
+                fail("Should not have gotten here, this should throw an error, the command exists, but it doesn't run successfully")
+            }
+        }
+    }
+
     @Test public void testGetBranchNames() {
         String mockResult = """
 10b42258f451ebf2640d3c18850e0c22eecdad4\trefs/heads/ted/feature_branch
