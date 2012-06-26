@@ -49,9 +49,15 @@ class JenkinsApi {
         response.data.text
     }
 
-    void cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
+    void cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs) 
+    {
         String missingJobConfig = configForMissingJob(missingJob, templateJobs)
-        post('createItem', missingJobConfig, [name: missingJob.jobName], ContentType.XML)
+        TemplateJob templateJob = missingJob.templateJob
+
+        //Copy job with jenkins copy job api, this will make sure jenkins plugins get the call to make a copy if needed (promoted builds plugin needs this)
+        post('createItem', missingJobConfig, [name: missingJob.jobName,mode: 'copy', from:templateJob.jobName], ContentType.XML)
+
+        post('job/'+missingJob.jobName+"/config.xml",missingJobConfig,[:],ContentType.XML)
     }
 
     String configForMissingJob(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
