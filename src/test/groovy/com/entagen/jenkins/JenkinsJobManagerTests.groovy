@@ -40,4 +40,15 @@ class JenkinsJobManagerTests extends GroovyTestCase {
         assert "myproj-foo-myfeature" == templateJob.jobNameForBranch("myfeature")
         assert "myproj-foo-ted_myfeature" == templateJob.jobNameForBranch("ted/myfeature")
     }
+
+
+    @Test public void testInitGitApi_noBranchRegex() {
+        JenkinsJobManager jenkinsJobManager = new JenkinsJobManager(gitUrl: "git@dummy.com:company/myproj.git", jenkinsUrl: "http://dummy.com")
+        assert jenkinsJobManager.gitApi
+    }
+
+    @Test public void testInitGitApi_withBranchRegex() {
+        JenkinsJobManager jenkinsJobManager = new JenkinsJobManager(gitUrl: "git@dummy.com:company/myproj.git", branchNameRegex: 'feature\\/.+|release\\/.+|master', jenkinsUrl: "http://dummy.com")
+        assert jenkinsJobManager.gitApi
+    }
 }
