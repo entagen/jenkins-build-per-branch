@@ -71,8 +71,12 @@ class Main {
 
     public static showConfiguration(Map<String, String> argsMap) {
         println "==============================================================="
-        argsMap.each { k, v -> println " $k: $v" }
+        argsMap.each { k, v -> println " $k: ${formatValue(k, v)}" }
         println "==============================================================="
+    }
+
+    public static formatValue(String key, String value) {
+        return (key == "jenkinsPassword") ? "********" : value
     }
 
     public static Map<String, String> mergeSystemPropertyOptions(OptionAccessor commandLineOptions) {
