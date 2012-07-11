@@ -15,6 +15,8 @@ class JenkinsApi {
     String jenkinsServerUrl
     RESTClient restClient
     HttpRequestInterceptor requestInterceptor
+    boolean findCrumb = true
+    def crumbInfo
 
     public void setJenkinsServerUrl(String jenkinsServerUrl) {
         if (!jenkinsServerUrl.endsWith("/")) jenkinsServerUrl += "/"
@@ -143,6 +145,51 @@ class JenkinsApi {
      * from https://github.com/kellyrob99/Jenkins-api-tour/blob/master/src/main/groovy/org/kar/hudson/api/PostRequestSupport.groovy
      */
     protected Integer post(String path, postBody = [:], params = [:], ContentType contentType = ContentType.URLENC) {
+
+        //Added the support for jenkins CSRF option, this could be changed to be a build flag if needed.
+        //http://jenkinsurl.com/crumbIssuer/api/json  get crumb for csrf protection  json: {"crumb":"c8d8812d615292d4c0a79520bacfa7d8","crumbRequestField":".crumb"}
+        if(findCrumb)
+        {
+          findCrumb = false
+          println "Trying to find crumb: ${jenkinsServerUrl}crumbIssuer/api/json"
+          try {
+            def response = restClient.get(path:"crumbIssuer/api/json")
+            
+            if(response.data.crumbRequestField && response.data.crumb)
+            {
+              crumbInfo = [:]
+              crumbInfo['field'] = response.data.crumbRequestField
+              crumbInfo['crumb'] = response.data.crumb
+            }
+            else
+            {
+              println "Found crumbIssuer but didn't understand the response data trying to move on."
+              println "Response data: "+response.data
+            }
+          }
+          catch(HttpResponseException e) {
+            if(e.response?.status == 404)
+            {
+              println "Couldn't find crumbIssuer for jenkins. Just moving on it may not be needed."
+            }
+            else
+            {
+              def msg =  "Unexpected failure on ${jenkinsServerUrl}crumbIssuer/api/json: ${resp.statusLine} ${resp.status}"
+              throw new Exception(msg)
+            }
+          }
+        }
+
+        if(crumbInfo)
+        {
+          params[crumbInfo.field] = crumbInfo.crumb
+        }
+
+
+
+
+
+
         HTTPBuilder http = new HTTPBuilder(jenkinsServerUrl)
 
         if (requestInterceptor) {
@@ -152,8 +199,9 @@ class JenkinsApi {
         Integer status = HttpStatus.SC_EXPECTATION_FAILED
 
         http.handler.failure = { resp ->
-            println "Unexpected failure on $jenkinsServerUrl$path: ${resp.statusLine} ${resp.status}"
+            def msg =  "Unexpected failure on $jenkinsServerUrl$path: ${resp.statusLine} ${resp.status}"
             status = resp.statusLine.statusCode
+            throw new Exception(msg)
         }
 
         http.post(path: path, body: postBody, query: params,
