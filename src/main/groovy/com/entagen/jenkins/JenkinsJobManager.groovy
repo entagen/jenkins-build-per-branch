@@ -13,6 +13,7 @@ class JenkinsJobManager {
     String jenkinsPassword
     
     Boolean dryRun = false
+    Boolean noDelete = false
 
     JenkinsApi jenkinsApi
     GitApi gitApi
@@ -45,7 +46,9 @@ class JenkinsJobManager {
         List<ConcreteJob> expectedJobs = this.expectedJobs(templateJobs, nonTemplateBranchNames)
 
         createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
-        deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
+        if (!noDelete) {
+            deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
+        }
     }
 
     public void createMissingJobs(List<ConcreteJob> expectedJobs, List<String> currentJobs, List<TemplateJob> templateJobs) {
@@ -105,8 +108,10 @@ class JenkinsJobManager {
         List<BranchView> missingBranchViews = expectedBranchViews.findAll { BranchView branchView -> !existingViewNames.contains(branchView.viewName)}
         addMissingViews(missingBranchViews)
 
-        List<String> deprecatedViewNames = getDeprecatedViewNames(existingViewNames, expectedBranchViews)
-        deleteDeprecatedViews(deprecatedViewNames)
+        if (!noDelete) {
+            List<String> deprecatedViewNames = getDeprecatedViewNames(existingViewNames, expectedBranchViews)
+            deleteDeprecatedViews(deprecatedViewNames)
+        }
     }
 
     public void addMissingViews(List<BranchView> missingViews) {
