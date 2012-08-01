@@ -13,6 +13,7 @@ class JenkinsJobManager {
     String jenkinsPassword
     
     Boolean dryRun = false
+    Boolean noViews = false
 
     JenkinsApi jenkinsApi
     GitApi gitApi
@@ -36,7 +37,9 @@ class JenkinsJobManager {
         syncJobs(allBranchNames, allJobNames, templateJobs)
 
         // create any missing branch views, scoped within a nested view if we were given one
-        syncViews(allBranchNames)
+        if (!noViews) {
+            syncViews(allBranchNames)
+        }
     }
 
     public void syncJobs(List<String> allBranchNames, List<String> allJobNames, List<TemplateJob> templateJobs) {
