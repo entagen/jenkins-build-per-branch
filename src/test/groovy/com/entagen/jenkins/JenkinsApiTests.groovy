@@ -26,9 +26,9 @@ class JenkinsApiTests extends GroovyTestCase {
 
     @Test public void test404ThrowsException() {
         MockFor mockRESTClient = new MockFor(RESTClient)
-        mockRESTClient.demand.get { Map<String,?> args ->
+        mockRESTClient.demand.get { Map<String, ?> args ->
             def ex = new HttpResponseException(404, "Not Found")
-            ex.metaClass.getResponse = {-> [ status: 404 ] }
+            ex.metaClass.getResponse = {-> [status: 404] }
             throw ex
         }
 
@@ -90,6 +90,17 @@ class JenkinsApiTests extends GroovyTestCase {
         TemplateJob templateJob = new TemplateJob(templateBranchName: "master")
         ConcreteJob missingJob = new ConcreteJob(branchName: "new/branch", templateJob: templateJob)
         assert "<name>new/branch</name>" == api.configForMissingJob(missingJob, [])
+    }
+
+    @Test public void testConfigForMissingJob_worksWithExclusions() {
+        JenkinsApi api = new JenkinsApi()
+        api.metaClass.getJobConfig = { String jobConfig ->
+            "<assignedNode>master</assignedNode>"
+        }
+
+        TemplateJob templateJob = new TemplateJob(templateBranchName: "master")
+        ConcreteJob missingJob = new ConcreteJob(branchName: "new/branch", templateJob:  templateJob)
+        assert "<assignedNode>master</assignedNode>" == api.configForMissingJob(missingJob, [])
     }
 
     public void withJsonResponse(Map toJson, Closure closure) {

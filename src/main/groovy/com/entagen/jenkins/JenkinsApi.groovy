@@ -51,23 +51,31 @@ class JenkinsApi {
         response.data.text
     }
 
-    void cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs) 
-    {
+    void cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
         String missingJobConfig = configForMissingJob(missingJob, templateJobs)
         TemplateJob templateJob = missingJob.templateJob
 
         //Copy job with jenkins copy job api, this will make sure jenkins plugins get the call to make a copy if needed (promoted builds plugin needs this)
-        post('createItem', missingJobConfig, [name: missingJob.jobName,mode: 'copy', from:templateJob.jobName], ContentType.XML)
+        post('createItem', missingJobConfig, [name: missingJob.jobName, mode: 'copy', from: templateJob.jobName], ContentType.XML)
 
-        post('job/'+missingJob.jobName+"/config.xml",missingJobConfig,[:],ContentType.XML)
+        post('job/' + missingJob.jobName + "/config.xml", missingJobConfig, [:], ContentType.XML)
     }
 
     String configForMissingJob(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
         TemplateJob templateJob = missingJob.templateJob
         String config = getJobConfig(templateJob.jobName)
+
+        def ignoreTags = ["assignedNode"]
+
         // should work if there's a remote ("origin/master") or no remote (just "master")
-        config = config.replaceAll("([>/])(${templateJob.templateBranchName})<") { fullMatch, prefix, branchName ->
-            return "$prefix${missingJob.branchName}<"
+        config = config.replaceAll("(\\p{Alnum}*[>/])(${templateJob.templateBranchName})<") { fullMatch, prefix, branchName ->
+            // jenkins job configs may have certain fields whose values should not be replaced, the most common being <assignedNode>
+            // which is used to assign a job to a specific node (potentially "master") and the "master" branch
+            if (ignoreTags.find { it + ">" == prefix}) {
+                return fullMatch
+            } else {
+                return "$prefix${missingJob.branchName}<"
+            }
         }
 
         // this is in case there are other down-stream jobs that this job calls, we want to be sure we're replacing their names as well
@@ -124,13 +132,13 @@ class JenkinsApi {
 
         try {
             response = restClient.get(map)
-        } catch(HttpHostConnectException ex) {
+        } catch (HttpHostConnectException ex) {
             println "Unable to connect to host: $jenkinsServerUrl"
             throw ex
-        } catch(UnknownHostException ex) {
+        } catch (UnknownHostException ex) {
             println "Unknown host: $jenkinsServerUrl"
             throw ex
-        } catch(HttpResponseException ex) {
+        } catch (HttpResponseException ex) {
             def message = "Unexpected failure with path $jenkinsServerUrl${mapCopy.path}, HTTP Status Code: ${ex.response?.status}, full map: $mapCopy"
             throw new Exception(message, ex)
         }
@@ -138,7 +146,6 @@ class JenkinsApi {
         assert response.status < 400
         return response
     }
-
 
     /**
      * @author Kelly Robinson
@@ -148,41 +155,35 @@ class JenkinsApi {
 
         //Added the support for jenkins CSRF option, this could be changed to be a build flag if needed.
         //http://jenkinsurl.com/crumbIssuer/api/json  get crumb for csrf protection  json: {"crumb":"c8d8812d615292d4c0a79520bacfa7d8","crumbRequestField":".crumb"}
-        if(findCrumb)
-        {
-          findCrumb = false
-          println "Trying to find crumb: ${jenkinsServerUrl}crumbIssuer/api/json"
-          try {
-            def response = restClient.get(path:"crumbIssuer/api/json")
-            
-            if(response.data.crumbRequestField && response.data.crumb)
-            {
-              crumbInfo = [:]
-              crumbInfo['field'] = response.data.crumbRequestField
-              crumbInfo['crumb'] = response.data.crumb
+        if (findCrumb) {
+            findCrumb = false
+            println "Trying to find crumb: ${jenkinsServerUrl}crumbIssuer/api/json"
+            try {
+                def response = restClient.get(path: "crumbIssuer/api/json")
+
+                if (response.data.crumbRequestField && response.data.crumb) {
+                    crumbInfo = [:]
+                    crumbInfo['field'] = response.data.crumbRequestField
+                    crumbInfo['crumb'] = response.data.crumb
+                }
+                else {
+                    println "Found crumbIssuer but didn't understand the response data trying to move on."
+                    println "Response data: " + response.data
+                }
             }
-            else
-            {
-              println "Found crumbIssuer but didn't understand the response data trying to move on."
-              println "Response data: "+response.data
+            catch (HttpResponseException e) {
+                if (e.response?.status == 404) {
+                    println "Couldn't find crumbIssuer for jenkins. Just moving on it may not be needed."
+                }
+                else {
+                    def msg = "Unexpected failure on ${jenkinsServerUrl}crumbIssuer/api/json: ${resp.statusLine} ${resp.status}"
+                    throw new Exception(msg)
+                }
             }
-          }
-          catch(HttpResponseException e) {
-            if(e.response?.status == 404)
-            {
-              println "Couldn't find crumbIssuer for jenkins. Just moving on it may not be needed."
-            }
-            else
-            {
-              def msg =  "Unexpected failure on ${jenkinsServerUrl}crumbIssuer/api/json: ${resp.statusLine} ${resp.status}"
-              throw new Exception(msg)
-            }
-          }
         }
 
-        if(crumbInfo)
-        {
-          params[crumbInfo.field] = crumbInfo.crumb
+        if (crumbInfo) {
+            params[crumbInfo.field] = crumbInfo.crumb
         }
 
 
@@ -199,7 +200,7 @@ class JenkinsApi {
         Integer status = HttpStatus.SC_EXPECTATION_FAILED
 
         http.handler.failure = { resp ->
-            def msg =  "Unexpected failure on $jenkinsServerUrl$path: ${resp.statusLine} ${resp.status}"
+            def msg = "Unexpected failure on $jenkinsServerUrl$path: ${resp.statusLine} ${resp.status}"
             status = resp.statusLine.statusCode
             throw new Exception(msg)
         }
