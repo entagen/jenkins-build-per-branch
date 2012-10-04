@@ -32,12 +32,22 @@ class GitApi {
     public void eachResultLine(String command, Closure closure) {
         println "executing command: $command"
         def process = command.execute()
+        def inputStream = process.getInputStream()
+        def gitOutput = ""
+
+        while(true) {
+          int readByte = inputStream.read()
+          if (readByte == -1) break // EOF
+          byte[] bytes = new byte[1]
+          bytes[0] = readByte
+          gitOutput = gitOutput.concat(new String(bytes))
+        }
         process.waitFor()
 
         if (process.exitValue() == 0) {
-            process.in.text.eachLine { String line ->
-                closure(line)
-            }
+            gitOutput.eachLine { String line ->
+               closure(line)
+          }
         } else {
             String errorText = process.errorStream.text?.trim()
             println "error executing command: $command"
