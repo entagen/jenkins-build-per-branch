@@ -139,7 +139,7 @@ class JenkinsJobManager {
          return existingViewNames?.findAll { it.startsWith(this.templateJobPrefix) } - expectedBranchViews?.viewName ?: []
         }
         else {
-         return existingViewNames? - expectedBranchViews?.viewName ?: []
+         return existingViewNames - expectedBranchViews?.viewName ?: []
         }
     }
 
