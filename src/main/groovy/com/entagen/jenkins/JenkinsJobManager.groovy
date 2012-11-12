@@ -135,7 +135,12 @@ class JenkinsJobManager {
     }
 
     public List<String> getDeprecatedViewNames(List<String> existingViewNames, List<BranchView> expectedBranchViews) {
+    	if(this.templateJobPrefix) {
          return existingViewNames?.findAll { it.startsWith(this.templateJobPrefix) } - expectedBranchViews?.viewName ?: []
+        }
+        else {
+         return existingViewNames? - expectedBranchViews?.viewName ?: []
+        }
     }
 
     public void deleteDeprecatedViews(List<String> deprecatedViewNames) {
