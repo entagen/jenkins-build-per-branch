@@ -61,6 +61,12 @@ class JenkinsApi {
         post('job/' + missingJob.jobName + "/config.xml", missingJobConfig, [:], ContentType.XML)
     }
 
+    /*  https://192.168.4.60/hudson/job/estore-build-feature_base63_sprites/build */
+    void startJob(ConcreteJob job) {
+	println "Starting job ${job.jobName}."
+	post('job/' + job.jobName + '/build')
+    }
+
     String configForMissingJob(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
         TemplateJob templateJob = missingJob.templateJob
         String config = getJobConfig(templateJob.jobName)
