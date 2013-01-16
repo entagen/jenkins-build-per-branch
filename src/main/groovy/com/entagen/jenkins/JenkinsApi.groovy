@@ -61,9 +61,12 @@ class JenkinsApi {
         post('job/' + missingJob.jobName + "/config.xml", missingJobConfig, [:], ContentType.XML)
     }
 
-    void startJob(ConcreteJob job) {
+    void startJob(ConcreteJob job, String method) {
+        if (method == "true" || method == "1") {
+            method = "build"
+        }
         println "Starting job ${job.jobName}."
-        post('job/' + job.jobName + '/build')
+        post('job/' + job.jobName + '/' + method)
     }
 
     String configForMissingJob(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
