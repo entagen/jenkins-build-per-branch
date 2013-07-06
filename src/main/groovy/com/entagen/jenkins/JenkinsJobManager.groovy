@@ -11,7 +11,7 @@ class JenkinsJobManager {
     String branchNameRegex
     String jenkinsUser
     String jenkinsPassword
-    String allowSelfsignedSslCerts
+    Boolean allowSelfsignedSslCerts = false
     
     Boolean dryRun = false
     Boolean noViews = false
