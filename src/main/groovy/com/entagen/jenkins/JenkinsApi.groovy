@@ -213,7 +213,7 @@ class JenkinsApi {
             http.client.addRequestInterceptor(this.requestInterceptor)
         }
         if (this.socketFactory){
-            http.client.connectionManager.schemeRegistry.register(new Scheme("https", sf, 443))
+            http.client.connectionManager.schemeRegistry.register(new Scheme("https", this.socketFactory, 443))
         }
 
         Integer status = HttpStatus.SC_EXPECTATION_FAILED
