@@ -11,7 +11,7 @@ class JenkinsJobManager {
     String branchNameRegex
     String jenkinsUser
     String jenkinsPassword
-    
+
     Boolean dryRun = false
     Boolean noViews = false
     Boolean noDelete = false
@@ -73,6 +73,7 @@ class JenkinsJobManager {
         if (!deprecatedJobNames) return
         println "Deleting deprecated jobs:\n\t${deprecatedJobNames.join('\n\t')}"
         deprecatedJobNames.each { String jobName ->
+            jenkinsApi.wipeOutWorkspace(jobName)
             jenkinsApi.deleteJob(jobName)
         }
     }
