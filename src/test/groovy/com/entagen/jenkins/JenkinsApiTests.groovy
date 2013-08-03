@@ -12,9 +12,9 @@ class JenkinsApiTests extends GroovyTestCase {
 
     @Test public void testInvalidHostThrowsConnectionException() {
         JenkinsApi api = new JenkinsApi(jenkinsServerUrl: "http://invalid.foo:9090/jenkins")
-        assert "invalid.foo: nodename nor servname provided, or not known" == shouldFail(UnknownHostException) {
+        assert shouldFail(UnknownHostException) {
             api.getJobNames("myproj")
-        }
+        }.contains("invalid.foo")
     }
 
     @Test public void testCantConnectToEndpointThrowsException() {
