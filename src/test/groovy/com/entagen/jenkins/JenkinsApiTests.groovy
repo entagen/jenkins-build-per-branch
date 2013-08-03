@@ -1,5 +1,6 @@
 package com.entagen.jenkins
 
+import org.apache.http.conn.HttpHostConnectException
 import org.junit.Test
 import groovy.mock.interceptor.MockFor
 import org.apache.http.client.HttpResponseException
@@ -11,14 +12,14 @@ class JenkinsApiTests extends GroovyTestCase {
 
     @Test public void testInvalidHostThrowsConnectionException() {
         JenkinsApi api = new JenkinsApi(jenkinsServerUrl: "http://invalid.foo:9090/jenkins")
-        assert "invalid.foo" == shouldFail {
+        assert "invalid.foo: nodename nor servname provided, or not known" == shouldFail(UnknownHostException) {
             api.getJobNames("myproj")
         }
     }
 
     @Test public void testCantConnectToEndpointThrowsException() {
         JenkinsApi api = new JenkinsApi(jenkinsServerUrl: "http://localhost:12345/jenkins")
-        assert "Connection to http://localhost:12345 refused" == shouldFail {
+        assert "Connection to http://localhost:12345 refused" == shouldFail(HttpHostConnectException) {
             api.getJobNames("myproj")
         }
 
