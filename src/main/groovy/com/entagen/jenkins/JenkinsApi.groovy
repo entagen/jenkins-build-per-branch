@@ -101,6 +101,11 @@ class JenkinsApi {
         post("job/${jobName}/doWipeOutWorkspace")
     }
 
+    void enableJob(String jobName) {
+        println "enable job $jobName"
+        post("job/${jobName}/enable")
+    }
+
     void createViewForBranch(BranchView branchView, String nestedWithinView = null) {
         String viewName = branchView.viewName
         Map body = [name: viewName, mode: 'hudson.model.ListView', Submit: 'OK', json: '{"name": "' + viewName + '", "mode": "hudson.model.ListView"}']
