@@ -1,6 +1,7 @@
 package com.entagen.jenkins
 
 import java.util.regex.Pattern
+import groovy.json.JsonSlurper
 
 class JenkinsJobManager {
     String templateJobPrefix
@@ -11,7 +12,9 @@ class JenkinsJobManager {
     String branchNameRegex
     String jenkinsUser
     String jenkinsPassword
-
+    String cleanupJobName
+    String deployJobBaseName
+    
     Boolean dryRun = false
     Boolean noViews = false
     Boolean noDelete = false
@@ -48,7 +51,7 @@ class JenkinsJobManager {
         List<String> currentTemplateDrivenJobNames = templateDrivenJobNames(templateJobs, allJobNames)
         List<String> nonTemplateBranchNames = allBranchNames - templateBranchName
         List<ConcreteJob> expectedJobs = this.expectedJobs(templateJobs, nonTemplateBranchNames)
-
+        
         createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
         if (!noDelete) {
             deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
@@ -67,7 +70,6 @@ class JenkinsJobManager {
                 jenkinsApi.startJob(missingJob)
             }
         }
-
     }
 
     public void deleteDeprecatedJobs(List<String> deprecatedJobNames) {
@@ -76,6 +78,19 @@ class JenkinsJobManager {
         deprecatedJobNames.each { String jobName ->
             jenkinsApi.wipeOutWorkspace(jobName)
             jenkinsApi.deleteJob(jobName)
+        }
+        
+        if (cleanupJobName != null) {
+            List<String> deployFeatureNames = deprecatedJobNames.collectMany{ it.startsWith(deployJobBaseName) ? [it.replace(deployJobBaseName, '')] : [] }
+            
+            if (deployFeatureNames.size > 0) {
+                String features = deployFeatureNames.join(',')
+                println "Cleaning up Features:$features using $cleanupJobName"
+                
+                def body = [:]
+                body = [json:  '{"parameter":[{"name": "Features", "value": "' + features + '"}]}']
+                jenkinsApi.startJobWithParameters(cleanupJobName, body)
+            }
         }
     }
 
