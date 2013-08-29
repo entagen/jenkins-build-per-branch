@@ -11,12 +11,13 @@ class GitApi {
         List<String> branchNames = []
 
         eachResultLine(command) { String line ->
-            println "\t$line"
-            // lines are in the format of: <SHA>\trefs/heads/BRANCH_NAME
-            // ex: b9c209a2bf1c159168bf6bc2dfa9540da7e8c4a26\trefs/heads/master
             String branchNameRegex = "^.*\trefs/heads/(.*)\$"
             String branchName = line.find(branchNameRegex) { full, branchName -> branchName }
-            if (passesFilter(branchName)) branchNames << branchName
+            Boolean selected = passesFilter(branchName)
+            println "\t" + (selected ? "* " : "  ") + "$line"
+            // lines are in the format of: <SHA>\trefs/heads/BRANCH_NAME
+            // ex: b9c209a2bf1c159168bf6bc2dfa9540da7e8c4a26\trefs/heads/master
+            if (selected) branchNames << branchName
         }
 
         return branchNames
