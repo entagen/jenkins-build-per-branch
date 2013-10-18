@@ -14,27 +14,38 @@ class JenkinsJobManager {
     Boolean noViews = false
     Boolean noDelete = false
     Boolean startOnCreate = false
+    Boolean pullRequests = false
 
     JenkinsApi jenkinsApi
     GitApi gitApi
+    GitHubApi gitHubApi
 
     JenkinsJobManager(Map props) {
         for (property in props) {
+            println "Setting property key ${property.key} w/ value ${property.value}"
             this."${property.key}" = property.value
         }
         initJenkinsApi()
         initGitApi()
+        initGitHubApi()
     }
 
     void syncWithRepo() {
-        List<String> allBranchNames = gitApi.branchNames
+//        List<String> allBranchNames = gitApi.branchNames
         List<String> allJobNames = jenkinsApi.jobNames
 
         // ensure that there is at least one job matching the template pattern, collect the set of template jobs
         List<TemplateJob> templateJobs = findRequiredTemplateJobs(allJobNames)
 
+        List<ConcreteJob> expectedBranchJobs = gitApi.getBranchJobs(templateJobs)
+        if(pullRequests) {
+            expectedBranchJobs.addAll(gitHubApi.getBranchJobs(templateJobs))
+        }
+
+        List<String> allBranchNames = expectedBranchJobs.collect { it.branchName }
+
         // create any missing template jobs and delete any jobs matching the template patterns that no longer have branches
-        syncJobs(allBranchNames, allJobNames, templateJobs)
+        syncJobs(expectedBranchJobs, allJobNames, templateJobs)
 
         // create any missing branch views, scoped within a nested view if we were given one
         if (!noViews) {
@@ -42,10 +53,8 @@ class JenkinsJobManager {
         }
     }
 
-    public void syncJobs(List<String> allBranchNames, List<String> allJobNames, List<TemplateJob> templateJobs) {
+    public void syncJobs(List<ConcreteJob> expectedJobs, List<String> allJobNames, List<TemplateJob> templateJobs) {
         List<String> currentTemplateDrivenJobNames = templateDrivenJobNames(templateJobs, allJobNames)
-        List<String> nonTemplateBranchNames = allBranchNames - templateBranchName
-        List<ConcreteJob> expectedJobs = this.expectedJobs(templateJobs, nonTemplateBranchNames)
 
         createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
         if (!noDelete) {
@@ -64,7 +73,6 @@ class JenkinsJobManager {
                 jenkinsApi.startJob(missingJob)
             }
         }
-
     }
 
     public void deleteDeprecatedJobs(List<String> deprecatedJobNames) {
@@ -75,12 +83,12 @@ class JenkinsJobManager {
         }
     }
 
-    public List<ConcreteJob> expectedJobs(List<TemplateJob> templateJobs, List<String> branchNames) {
-        branchNames.collect { String branchName ->
-            templateJobs.collect { TemplateJob templateJob -> templateJob.concreteJobForBranch(branchName) }
-        }.flatten()
-    }
-
+    /**
+     * Returns a List of job names that were created from templates
+     * @param templateJobs
+     * @param allJobNames
+     * @return
+     */
     public List<String> templateDrivenJobNames(List<TemplateJob> templateJobs, List<String> allJobNames) {
         List<String> templateJobNames = templateJobs.jobName
         List<String> templateBaseJobNames = templateJobs.baseJobName
@@ -94,11 +102,13 @@ class JenkinsJobManager {
     List<TemplateJob> findRequiredTemplateJobs(List<String> allJobNames) {
         def templateBranchJobName = templateBranchName.replaceAll('/', '_')
         String regex = /^($templateJobPrefix-[^-]*)-($templateBranchJobName)$/
-
+        println "All job names: " + allJobNames.join(",")
         List<TemplateJob> templateJobs = allJobNames.findResults { String jobName ->
             TemplateJob templateJob = null
             jobName.find(regex) { full, baseJobName, branchName ->
-                templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: templateBranchName)
+                println "Found template job $full"
+                String config = jenkinsApi.getJobConfig(full)
+                templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: templateBranchName, config: config)
             }
             return templateJob
         }
@@ -166,5 +176,16 @@ class JenkinsJobManager {
         }
 
         return this.gitApi
+    }
+
+    GitHubApi initGitHubApi() {
+        if (!gitHubApi) {
+            assert gitUrl != null
+            this.gitHubApi = new GitHubApi(gitUrl: gitUrl)
+            if (this.branchNameRegex) {
+                this.gitHubApi.branchNameFilter = ~this.branchNameRegex
+            }
+        }
+        return this.gitHubApi
     }
 }

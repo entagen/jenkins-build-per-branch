@@ -11,34 +11,17 @@ import org.apache.http.HttpRequestInterceptor
 import org.apache.http.protocol.HttpContext
 import org.apache.http.HttpRequest
 
+@Mixin(HttpHelper)
 class JenkinsApi {
-    String jenkinsServerUrl
-    RESTClient restClient
-    HttpRequestInterceptor requestInterceptor
-    boolean findCrumb = true
-    def crumbInfo
 
     public void setJenkinsServerUrl(String jenkinsServerUrl) {
         if (!jenkinsServerUrl.endsWith("/")) jenkinsServerUrl += "/"
-        this.jenkinsServerUrl = jenkinsServerUrl
-        this.restClient = new RESTClient(jenkinsServerUrl)
-    }
-
-    public void addBasicAuth(String jenkinsServerUser, String jenkinsServerPassword) {
-        println "use basic authentication"
-
-        this.requestInterceptor = new HttpRequestInterceptor() {
-            void process(HttpRequest httpRequest, HttpContext httpContext) {
-                def auth = jenkinsServerUser + ':' + jenkinsServerPassword
-                httpRequest.addHeader('Authorization', 'Basic ' + auth.bytes.encodeBase64().toString())
-            }
-        }
-
-        this.restClient.client.addRequestInterceptor(this.requestInterceptor)
+        serverUrl = jenkinsServerUrl
+        restClient = new RESTClient(jenkinsServerUrl)
     }
 
     List<String> getJobNames(String prefix = null) {
-        println "getting project names from " + jenkinsServerUrl + "api/json"
+        println "getting project names from " + serverUrl + "api/json"
         def response = get(path: 'api/json')
         def jobNames = response.data.jobs.name
         if (prefix) return jobNames.findAll { it.startsWith(prefix) }
@@ -68,7 +51,7 @@ class JenkinsApi {
 
     String configForMissingJob(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
         TemplateJob templateJob = missingJob.templateJob
-        String config = getJobConfig(templateJob.jobName)
+        String config = missingJob.config
 
         def ignoreTags = ["assignedNode"]
 
@@ -126,96 +109,6 @@ class JenkinsApi {
         if (viewPrefix) return "$viewPrefix/$pathSuffix"
 
         return pathSuffix
-    }
-
-    protected get(Map map) {
-        // get is destructive to the map, if there's an error we want the values around still
-        Map mapCopy = map.clone() as Map
-        def response
-
-        assert mapCopy.path != null, "'path' is a required attribute for the GET method"
-
-        try {
-            response = restClient.get(map)
-        } catch (HttpHostConnectException ex) {
-            println "Unable to connect to host: $jenkinsServerUrl"
-            throw ex
-        } catch (UnknownHostException ex) {
-            println "Unknown host: $jenkinsServerUrl"
-            throw ex
-        } catch (HttpResponseException ex) {
-            def message = "Unexpected failure with path $jenkinsServerUrl${mapCopy.path}, HTTP Status Code: ${ex.response?.status}, full map: $mapCopy"
-            throw new Exception(message, ex)
-        }
-
-        assert response.status < 400
-        return response
-    }
-
-    /**
-     * @author Kelly Robinson
-     * from https://github.com/kellyrob99/Jenkins-api-tour/blob/master/src/main/groovy/org/kar/hudson/api/PostRequestSupport.groovy
-     */
-    protected Integer post(String path, postBody = [:], params = [:], ContentType contentType = ContentType.URLENC) {
-
-        //Added the support for jenkins CSRF option, this could be changed to be a build flag if needed.
-        //http://jenkinsurl.com/crumbIssuer/api/json  get crumb for csrf protection  json: {"crumb":"c8d8812d615292d4c0a79520bacfa7d8","crumbRequestField":".crumb"}
-        if (findCrumb) {
-            findCrumb = false
-            println "Trying to find crumb: ${jenkinsServerUrl}crumbIssuer/api/json"
-            try {
-                def response = restClient.get(path: "crumbIssuer/api/json")
-
-                if (response.data.crumbRequestField && response.data.crumb) {
-                    crumbInfo = [:]
-                    crumbInfo['field'] = response.data.crumbRequestField
-                    crumbInfo['crumb'] = response.data.crumb
-                }
-                else {
-                    println "Found crumbIssuer but didn't understand the response data trying to move on."
-                    println "Response data: " + response.data
-                }
-            }
-            catch (HttpResponseException e) {
-                if (e.response?.status == 404) {
-                    println "Couldn't find crumbIssuer for jenkins. Just moving on it may not be needed."
-                }
-                else {
-                    def msg = "Unexpected failure on ${jenkinsServerUrl}crumbIssuer/api/json: ${resp.statusLine} ${resp.status}"
-                    throw new Exception(msg)
-                }
-            }
-        }
-
-        if (crumbInfo) {
-            params[crumbInfo.field] = crumbInfo.crumb
-        }
-
-
-
-
-
-
-        HTTPBuilder http = new HTTPBuilder(jenkinsServerUrl)
-
-        if (requestInterceptor) {
-            http.client.addRequestInterceptor(this.requestInterceptor)
-        }
-
-        Integer status = HttpStatus.SC_EXPECTATION_FAILED
-
-        http.handler.failure = { resp ->
-            def msg = "Unexpected failure on $jenkinsServerUrl$path: ${resp.statusLine} ${resp.status}"
-            status = resp.statusLine.statusCode
-            throw new Exception(msg)
-        }
-
-        http.post(path: path, body: postBody, query: params,
-                requestContentType: contentType) { resp ->
-            assert resp.statusLine.statusCode < 400
-            status = resp.statusLine.statusCode
-        }
-        return status
     }
 
     static final String VIEW_COLUMNS_JSON = '''

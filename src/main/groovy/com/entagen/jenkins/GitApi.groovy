@@ -1,10 +1,32 @@
 package com.entagen.jenkins
 
+import groovyx.net.http.RESTClient
+import org.apache.http.client.HttpResponseException
+import org.apache.http.conn.HttpHostConnectException
+
 import java.util.regex.Pattern
 
-class GitApi {
+class GitApi extends BranchSource {
     String gitUrl
-    Pattern branchNameFilter = null
+
+    public List<ConcreteJob> getBranchJobs(List<TemplateJob> templates) {
+        List<ConcreteJob> jobs = []
+        List<String> branchNames = getBranchNames()
+        for(template in templates) {
+            for(branchName in branchNames) {
+                if(branchName != template.templateBranchName) {
+                    jobs << getBranchJob(branchName, template)
+                }
+            }
+        }
+        return jobs
+    }
+
+    ConcreteJob getBranchJob(String branchName, TemplateJob template) {
+        // git branches often have a forward slash in them, but they make jenkins cranky, turn it into an underscore
+        String jobName = template.jobNameForBranch(branchName)
+        return new ConcreteJob(templateJob: template, branchName: branchName, jobName: jobName, config: template.config)
+    }
 
     public List<String> getBranchNames() {
         String command = "git ls-remote --heads ${gitUrl}"
@@ -20,12 +42,6 @@ class GitApi {
         }
 
         return branchNames
-    }
-
-    public Boolean passesFilter(String branchName) {
-        if (!branchName) return false
-        if (!branchNameFilter) return true
-        return branchName ==~ branchNameFilter
     }
 
     // assumes all commands are "safe", if we implement any destructive git commands, we'd want to separate those out for a dry-run
@@ -55,5 +71,4 @@ class GitApi {
             throw new Exception("Error executing command: $command -> $errorText")
         }
     }
-
 }

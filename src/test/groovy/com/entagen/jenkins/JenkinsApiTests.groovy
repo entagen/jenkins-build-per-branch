@@ -73,34 +73,25 @@ class JenkinsApiTests extends GroovyTestCase {
 
     @Test public void testConfigForMissingJob_worksWithRemote() {
         JenkinsApi api = new JenkinsApi()
-        api.metaClass.getJobConfig = { String jobName ->
-            "<name>origin/master</name>"
-        }
 
         TemplateJob templateJob = new TemplateJob(templateBranchName: "master")
-        ConcreteJob missingJob = new ConcreteJob(branchName: "new/branch", templateJob: templateJob)
+        ConcreteJob missingJob = new ConcreteJob(branchName: "new/branch", templateJob: templateJob, config: "<name>origin/master</name>")
         assert "<name>origin/new/branch</name>" == api.configForMissingJob(missingJob, [])
     }
 
     @Test public void testConfigForMissingJob_worksWithoutRemote() {
         JenkinsApi api = new JenkinsApi()
-        api.metaClass.getJobConfig = { String jobName ->
-            "<name>master</name>"
-        }
 
         TemplateJob templateJob = new TemplateJob(templateBranchName: "master")
-        ConcreteJob missingJob = new ConcreteJob(branchName: "new/branch", templateJob: templateJob)
+        ConcreteJob missingJob = new ConcreteJob(branchName: "new/branch", templateJob: templateJob, config: "<name>master</name>")
         assert "<name>new/branch</name>" == api.configForMissingJob(missingJob, [])
     }
 
     @Test public void testConfigForMissingJob_worksWithExclusions() {
         JenkinsApi api = new JenkinsApi()
-        api.metaClass.getJobConfig = { String jobConfig ->
-            "<assignedNode>master</assignedNode>"
-        }
 
         TemplateJob templateJob = new TemplateJob(templateBranchName: "master")
-        ConcreteJob missingJob = new ConcreteJob(branchName: "new/branch", templateJob:  templateJob)
+        ConcreteJob missingJob = new ConcreteJob(branchName: "new/branch", templateJob:  templateJob, config: "<assignedNode>master</assignedNode>")
         assert "<assignedNode>master</assignedNode>" == api.configForMissingJob(missingJob, [])
     }
 

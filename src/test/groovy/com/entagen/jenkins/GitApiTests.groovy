@@ -77,7 +77,6 @@ abd856d2ae658ee5f14889b465f3adcaf65fb52b\trefs/heads/other_branch
 
         assert ["feature/myfeature"] == branchNames.sort()
     }
-
 }
 
 

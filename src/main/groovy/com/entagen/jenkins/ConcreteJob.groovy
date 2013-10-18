@@ -4,4 +4,5 @@ class ConcreteJob {
     TemplateJob templateJob
     String jobName
     String branchName
+    String config
 }
