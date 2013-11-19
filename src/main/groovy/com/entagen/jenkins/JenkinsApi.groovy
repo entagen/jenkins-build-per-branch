@@ -110,12 +110,12 @@ class JenkinsApi {
                 retries++
                 post(buildViewPath("configSubmit", nestedWithinView, viewName), body)
                 return
-            } catch (HttpNotFoundException ex) {
+            } catch (Exception e) {
                 if (retries < 3) {
-                    println "configSubmit threw HttpNotFoundException, retrying"
+                    println "configSubmit threw exception, retrying in 1 second"
                     sleep(1000)
                 } else {
-                    throw ex
+                    throw e
                 }
             }
         }
