@@ -104,7 +104,21 @@ class JenkinsApi {
 
         body = [useincluderegex: 'on', includeRegex: "${branchView.templateJobPrefix}.*${branchView.safeBranchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + branchView.templateJobPrefix + '.*' + branchView.safeBranchName + '"},' + VIEW_COLUMNS_JSON + '}']
         println "configuring view ${viewName}"
-        post(buildViewPath("configSubmit", nestedWithinView, viewName), body)
+        int retries = 0
+        while (true) {
+            try {
+                retries++
+                post(buildViewPath("configSubmit", nestedWithinView, viewName), body)
+                return
+            } catch (HttpNotFoundException ex) {
+                if (retries < 3) {
+                    println "configSubmit threw HttpNotFoundException, retrying"
+                    sleep(1000)
+                } else {
+                    throw ex
+                }
+            }
+        }
     }
 
     List<String> getViewNames(String nestedWithinView = null) {
