@@ -59,9 +59,12 @@ class JenkinsApi {
         post('createItem', missingJobConfig, [name: missingJob.jobName, mode: 'copy', from: templateJob.jobName], ContentType.XML)
 
         post('job/' + missingJob.jobName + "/config.xml", missingJobConfig, [:], ContentType.XML)
-        //Forced diable enable to work around Jenkins' automatic disabling of clones jobs
+        //Forced disable enable to work around Jenkins' automatic disabling of clones jobs
+        //But only if the original job was enabled
         post('job/' + missingJob.jobName + '/disable')
-        post('job/' + missingJob.jobName + '/enable')
+        if (!missingJobConfig.contains("<disabled>true</disabled>")) {
+            post('job/' + missingJob.jobName + '/enable')
+        }
     }
 
     void startJob(ConcreteJob job) {
