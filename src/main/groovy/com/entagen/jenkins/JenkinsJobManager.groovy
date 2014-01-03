@@ -81,7 +81,7 @@ class JenkinsJobManager {
         }
         
         if (cleanupJobName != null) {
-            List<String> deployFeatureNames = deprecatedJobNames.collectMany{ it.contains('deploy') ? [it.replace(deployJobBaseName, '').replace('-', '_').replace(' ', '')] : [] }
+            List<String> deployFeatureNames = deprecatedJobNames.collectMany{ it.startsWith(deployJobBaseName) ? [it.replace(deployJobBaseName, '').replace('-', '_').replace(' ', '')] : [] }
             
             if (deployFeatureNames.size > 0) {
                 String features = deployFeatureNames.join(',')
