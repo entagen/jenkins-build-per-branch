@@ -10,11 +10,17 @@ import org.apache.http.HttpStatus
 import org.apache.http.HttpRequestInterceptor
 import org.apache.http.protocol.HttpContext
 import org.apache.http.HttpRequest
+import org.apache.http.conn.ssl.SSLSocketFactory
+import org.apache.http.conn.scheme.Scheme
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy
+
+
 
 class JenkinsApi {
     String jenkinsServerUrl
     RESTClient restClient
     HttpRequestInterceptor requestInterceptor
+    SSLSocketFactory socketFactory
     boolean findCrumb = true
     def crumbInfo
 
@@ -37,6 +43,12 @@ class JenkinsApi {
         this.restClient.client.addRequestInterceptor(this.requestInterceptor)
     }
 
+    public void allowSelfsignedSslCerts(){
+        this.socketFactory = new SSLSocketFactory(new TrustSelfSignedStrategy())
+        this.socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
+        this.restClient.client.connectionManager.schemeRegistry.register(new Scheme("https", this.socketFactory, 443))
+    }
+
     List<String> getJobNames(String prefix = null) {
         println "getting project names from " + jenkinsServerUrl + "api/json"
         def response = get(path: 'api/json')
@@ -50,7 +62,6 @@ class JenkinsApi {
                 headers: [Accept: 'application/xml'])
         response.data.text
     }
-
     void cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
         String missingJobConfig = configForMissingJob(missingJob, templateJobs)
         TemplateJob templateJob = missingJob.templateJob
@@ -203,6 +214,9 @@ class JenkinsApi {
 
         if (requestInterceptor) {
             http.client.addRequestInterceptor(this.requestInterceptor)
+        }
+        if (this.socketFactory){
+            http.client.connectionManager.schemeRegistry.register(new Scheme("https", this.socketFactory, 443))
         }
 
         Integer status = HttpStatus.SC_EXPECTATION_FAILED

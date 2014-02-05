@@ -11,6 +11,7 @@ class JenkinsJobManager {
     String branchNameRegex
     String jenkinsUser
     String jenkinsPassword
+    Boolean allowSelfsignedSslCerts = false
     
     Boolean dryRun = false
     Boolean noViews = false
@@ -152,6 +153,7 @@ class JenkinsJobManager {
             }
 
             if (jenkinsUser || jenkinsPassword) this.jenkinsApi.addBasicAuth(jenkinsUser, jenkinsPassword)
+            if (allowSelfsignedSslCerts) this.jenkinsApi.allowSelfsignedSslCerts()
         }
 
         return this.jenkinsApi
