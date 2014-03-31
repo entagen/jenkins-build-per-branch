@@ -1,7 +1,6 @@
 package com.entagen.jenkins
 
 import groovyx.net.http.ContentType
-import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.RESTClient
 import static groovyx.net.http.ContentType.*
 import org.apache.http.conn.HttpHostConnectException
@@ -197,12 +196,7 @@ class JenkinsApi {
             params[crumbInfo.field] = crumbInfo.crumb
         }
 
-
-
-
-
-
-        HTTPBuilder http = new HTTPBuilder(jenkinsServerUrl)
+        RESTClient http = new RESTClient(jenkinsServerUrl)
 
         if (requestInterceptor) {
             http.client.addRequestInterceptor(this.requestInterceptor)
