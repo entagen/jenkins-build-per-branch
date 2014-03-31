@@ -100,6 +100,7 @@
                 <li><code>-DbranchNameRegex</code> - ex: feature\/.+|release\/.+|master - only branches matching the regex will be accepted (your <code>templateBranchName</code> must pass this regex if given!) - optional</li>
                 <li><code>-DnestedView</code> - ex: MyProject-feature-branches - optional - the name of the existing nested view that will hold a view per feature branch, reqires the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Nested+View+Plugin">Nested View</a> plugin to be installed. This is useful to avoid an explosion of tabs in Jenkin's UI. Without this parameter, each branch will get it's jobs in it's own tab at the top.</li>
                 <li><code>-DdryRun</code> - ex: true - if this flag is passed with any value, it will not execute any changes only print out what would happen</li>
+                <li><code>-DstartOnCreate</code> - ex: true - if this flag is passed with any value, newly created jobs (i.e. because a new feature branch was created) will be executed immediately instead of waiting for the next polling interval or git-hook trigger. Most users will want to set this.</li>
             </ul>
 
             <h2>Conventions</h2>
