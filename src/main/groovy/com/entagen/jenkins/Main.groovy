@@ -44,7 +44,6 @@ class Main {
 
         if (argsMap.printConfig) {
             showConfiguration(argsMap)
-            System.exit(0)
         }
 
         def missingArgs = opts.findAll { shortOpt, optMap ->
