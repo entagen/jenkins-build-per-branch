@@ -11,6 +11,8 @@ class JenkinsJobManager {
     String branchNameRegex
     String jenkinsUser
     String jenkinsPassword
+    String enableJobRegex
+    String disableJobRegex
     
     Boolean dryRun = false
     Boolean noViews = false
@@ -61,7 +63,7 @@ class JenkinsJobManager {
 
         for(ConcreteJob missingJob in missingJobs) {
             println "Creating missing job: ${missingJob.jobName} from ${missingJob.templateJob.jobName}"
-            jenkinsApi.cloneJobForBranch(missingJob, templateJobs)
+            jenkinsApi.cloneJobForBranch(missingJob, templateJobs, enableJobRegex, disableJobRegex)
             if (startOnCreate) {
                 jenkinsApi.startJob(missingJob)
             }
