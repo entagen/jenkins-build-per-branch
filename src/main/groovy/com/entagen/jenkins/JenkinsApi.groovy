@@ -51,7 +51,7 @@ class JenkinsApi {
         response.data.text
     }
 
-    void cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs, String enableJobRegex, String disableJobRegex) {
+    boolean cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs, String enableJobRegex, String disableJobRegex) {
         String missingJobConfig = configForMissingJob(missingJob, templateJobs)
         TemplateJob templateJob = missingJob.templateJob
 
@@ -65,14 +65,17 @@ class JenkinsApi {
 
         if (missingJob.jobName =~ disableJobRegex) {
             println "Disabling ${missingJob.jobName} as it matches disableJobRegex (${disableJobRegex})"
+            return false
         }
-        else if (missingJob.jobName =~ enableJobRegex) {
+        if (missingJob.jobName =~ enableJobRegex) {
             println "Enabling ${missingJob.jobName} as it matches enableJobRegex (${enableJobRegex})"
             post('job/' + missingJob.jobName + '/enable')
+            return true
         }
-        else if (!missingJobConfig.contains("<disabled>true</disabled>")) {
+        if (!missingJobConfig.contains("<disabled>true</disabled>")) {
             println "Enabling ${missingJob.jobName} as the template job is enabled"
             post('job/' + missingJob.jobName + '/enable')
+            return true
         }
     }
 
