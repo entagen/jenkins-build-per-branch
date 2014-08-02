@@ -32,7 +32,7 @@ class JenkinsJobManager {
     }
 
     void syncWithRepo() {
-        List<String> allBranchNames = gitApi.branchNames
+        List<String> allBranchNames = gitApi.branchNames.unique{ it.toLowerCase() }
         List<String> allJobNames = jenkinsApi.jobNames
 
         // ensure that there is at least one job matching the template pattern, collect the set of template jobs
