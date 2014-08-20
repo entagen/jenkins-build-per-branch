@@ -79,19 +79,6 @@ class JenkinsJobManager {
             jenkinsApi.wipeOutWorkspace(jobName)
             jenkinsApi.deleteJob(jobName)
         }
-        
-        if (cleanupJobName != null) {
-            List<String> deployFeatureNames = deprecatedJobNames.collectMany{ it.startsWith(deployJobBaseName) ? [it.replace(deployJobBaseName, '').replace('-', '_').replace(' ', '')] : [] }
-            
-            if (deployFeatureNames.size > 0) {
-                String features = deployFeatureNames.join(',')
-                println "Cleaning up Features:$features using $cleanupJobName"
-                
-                def body = [:]
-                body = [json:  '{"parameter":[{"name": "Features", "value": "' + features + '"}]}']
-                jenkinsApi.startJobWithParameters(cleanupJobName, body)
-            }
-        }
     }
 
     public List<ConcreteJob> expectedJobs(List<TemplateJob> templateJobs, List<String> branchNames) {
