@@ -37,19 +37,7 @@ class JenkinsApi {
         this.restClient.client.addRequestInterceptor(this.requestInterceptor)
     }
 
-    List<String> getJobNames(String prefix = null) {
-        println "getting project names from " + jenkinsServerUrl + "api/json"
-        def response = get(path: 'api/json')
-        def jobNames = response.data.jobs.name
-        if (prefix) return jobNames.findAll { it.startsWith(prefix) }
-        return jobNames
-    }
 
-    String getJobConfig(String jobName) {
-        def response = get(path: "job/${jobName}/config.xml", contentType: TEXT,
-                headers: [Accept: 'application/xml'])
-        response.data.text
-    }
 
     void cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
         String missingJobConfig = configForMissingJob(missingJob, templateJobs)
@@ -66,10 +54,26 @@ class JenkinsApi {
             post('job/' + missingJob.jobName + '/enable')
         }
     }
-
+void startJob(String jobName) {
+    println "Starting job"+ jobName
+    post('job/' +jobName + '/build')
+}
     void startJob(ConcreteJob job) {
         println "Starting job ${job.jobName}."
         post('job/' + job.jobName + '/build')
+    }
+    List<String> getJobNames(String prefix = null) {
+        println "getting project names from " + jenkinsServerUrl + "api/json"
+        def response = get(path: 'api/json')
+        def jobNames = response.data.jobs.name
+        if (prefix) return jobNames.findAll { it.startsWith(prefix) }
+        return jobNames
+    }
+
+    String getJobConfig(String jobName) {
+        def response = get(path: "job/${jobName}/config.xml", contentType: TEXT,
+                headers: [Accept: 'application/xml'])
+        response.data.text
     }
 
     String configForMissingJob(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
@@ -108,9 +112,9 @@ class JenkinsApi {
         println "creating view - viewName:${viewName}, nestedView:${nestedWithinView}"
         post(buildViewPath("createView", nestedWithinView), body)
 
-        body = [useincluderegex: 'on', includeRegex: "${branchView.templateJobPrefix}.*${branchView.safeBranchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + branchView.templateJobPrefix + '.*' + branchView.safeBranchName + '"},' + VIEW_COLUMNS_JSON + '}']
-        println "configuring view ${viewName}"
-        post(buildViewPath("configSubmit", nestedWithinView, viewName), body)
+       // body = [useincluderegex: 'on', includeRegex: "${branchView.templateJobPrefix}.*${branchView.safeBranchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + branchView.templateJobPrefix + '.*' + branchView.safeBranchName + '"},' + VIEW_COLUMNS_JSON + '}']
+      //  println "configuring view ${viewName}"
+       // post(buildViewPath("configSubmit", nestedWithinView, viewName), body)
     }
 
     List<String> getViewNames(String nestedWithinView = null) {
