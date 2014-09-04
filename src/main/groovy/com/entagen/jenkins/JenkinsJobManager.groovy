@@ -11,6 +11,7 @@ class JenkinsJobManager {
     String branchNameRegex
     String jenkinsUser
     String jenkinsPassword
+    String test;
     
     Boolean dryRun = false
     Boolean noViews = false
@@ -26,6 +27,21 @@ class JenkinsJobManager {
         }
         initJenkinsApi()
         initGitApi()
+        testFunction()
+
+
+    }
+
+    public void testFunction() {
+       // System.out.println(jenkinsApi.getJobNames("Vivek"));
+       // System.out.println(jenkinsApi.getJobConfig("VivekTestSyncYOURPROJECTGitBranchesWithJenkins"));
+        //jenkinsApi.cre
+        jenkinsApi.startJob("VivekTestSyncYOURPROJECTGitBranchesWithJenkins");
+       // BranchView branchView = new BranchView("","GraphiteDasboards/tree/master");
+       //jenkinsApi.createViewForBranch(branchView,"");
+       // jenkinsApi.createViewForBranch("branchView");
+
+
     }
 
     void syncWithRepo() {
