@@ -51,7 +51,7 @@ class JenkinsJobManager {
         return result;
     }
 
-    public void config(String filePath, String pattern, String toInsert) {
+    public void config(String filePath, String pattern1,String pattern2, String toInsert) {
         // now edit the file
         // now add the first part
         // find the <builders> tag
@@ -65,8 +65,18 @@ class JenkinsJobManager {
             String suffix = "";
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             // line.con
+
             while ((line = bufferedReader.readLine()) != null) {
-                if (line.contains(pattern)) {
+                if(line.contains(pattern1)) {
+                    prefix = prefix + line + "\n";
+                    break;
+                }
+                else {
+                    prefix = prefix + line + "\n";
+                }
+            }
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.contains(pattern2)) {
                     end = true;
                     prefix = prefix + line + "\n";
                     continue;
@@ -125,7 +135,7 @@ class JenkinsJobManager {
                 "          </columns>\n" +
                 "        </hudson.plugins.nested__view.NestedView>";
        if(!fileRead.contains(org)) {
-           config("/d0/jenkins/config.xml", "<views>", toInsert);
+           config("/d0/jenkins/config.xml",rootFolder,"<views>", toInsert);
            restartJenkins();
 
        }
@@ -139,7 +149,7 @@ class JenkinsJobManager {
         // this can be done with existing functions
        createOrg(rootFolder,org);
        // restartJenkins();
-        jenkinsApi.createView(repoName,rootFolder,org);
+      //  jenkinsApi.createView(repoName,rootFolder,org);
 
 
 
