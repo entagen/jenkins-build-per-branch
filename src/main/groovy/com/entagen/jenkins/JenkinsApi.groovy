@@ -10,6 +10,7 @@ import org.apache.http.HttpStatus
 import org.apache.http.HttpRequestInterceptor
 import org.apache.http.protocol.HttpContext
 import org.apache.http.HttpRequest
+import java.io.*;
 
 class JenkinsApi {
     String jenkinsServerUrl
@@ -44,8 +45,10 @@ class JenkinsApi {
         TemplateJob templateJob = missingJob.templateJob
 
         //Copy job with jenkins copy job api, this will make sure jenkins plugins get the call to make a copy if needed (promoted builds plugin needs this)
-        post('createItem', missingJobConfig, [name: missingJob.jobName, mode: 'copy', from: templateJob.jobName], ContentType.XML)
-
+       // buildJobPath("createItem","Git")
+        //post('createItem', missingJobConfig, [name: missingJob.jobName, mode: 'copy', from: templateJob.jobName], ContentType.XML)
+        post(buildJobPath("createItem","nestedtype_git","nestedtype_org","repo"), missingJobConfig, [name: missingJob.jobName, mode: 'copy', from: templateJob.jobName], ContentType.XML)
+// "nestedtype_git","nestedtype_org","repo"
         post('job/' + missingJob.jobName + "/config.xml", missingJobConfig, [:], ContentType.XML)
         //Forced disable enable to work around Jenkins' automatic disabling of clones jobs
         //But only if the original job was enabled
@@ -65,7 +68,10 @@ void startJob(String jobName) {
     List<String> getJobNames(String prefix = null) {
         println "getting project names from " + jenkinsServerUrl + "api/json"
         def response = get(path: 'api/json')
+        System.out.println(response);
         def jobNames = response.data.jobs.name
+        System.out.println(jobNames);
+
         if (prefix) return jobNames.findAll { it.startsWith(prefix) }
         return jobNames
     }
@@ -106,6 +112,23 @@ void startJob(String jobName) {
         post("job/${jobName}/doDelete")
     }
 
+
+    void createView(String viewName) {
+        Map body = [name: viewName, mode: 'hudson.model.ListView', Submit: 'OK', json: '{"name": "' + viewName + '", "mode": "hudson.model.ListView"}']
+        post(buildViewPath("createView","Git"), body)
+         body = [useincluderegex: 'on', includeRegex: "${branchView.templateJobPrefix}.*${branchView.safeBranchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + branchView.templateJobPrefix + '.*' + branchView.safeBranchName + '"},' + VIEW_COLUMNS_JSON + '}']
+          println "configuring view ${viewName}"
+         post(buildViewPath("configSubmit", nestedWithinView, viewName), body)
+    }
+
+    void createView(String viewName, String rootFolder, String org) {
+        Map body = [name: viewName, mode: 'hudson.model.ListView', Submit: 'OK', json: '{"name": "' + viewName + '", "mode": "hudson.model.ListView"}']
+        post(buildViewPath("createView",rootFolder,org), body)
+       // body = [useincluderegex: 'on', includeRegex: "${branchView.templateJobPrefix}.*${branchView.safeBranchName}", name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + branchView.templateJobPrefix + '.*' + branchView.safeBranchName + '"},' + VIEW_COLUMNS_JSON + '}']
+       // println "configuring view ${viewName}"
+      //  post(buildViewPath("configSubmit", nestedWithinView, viewName), body)
+    }
+
     void createViewForBranch(BranchView branchView, String nestedWithinView = null) {
         String viewName = branchView.viewName
         Map body = [name: viewName, mode: 'hudson.model.ListView', Submit: 'OK', json: '{"name": "' + viewName + '", "mode": "hudson.model.ListView"}']
@@ -131,6 +154,17 @@ void startJob(String jobName) {
 
     protected String buildViewPath(String pathSuffix, String... nestedViews) {
         List elems = nestedViews.findAll { it != null }
+        println "elems"+elems;
+        String viewPrefix = elems.collect { "view/${it}" }.join('/')
+
+        if (viewPrefix) return "$viewPrefix/$pathSuffix"
+
+        return pathSuffix
+    }
+
+    protected String buildJobPath(String pathSuffix, String... nestedViews) {
+        List elems = nestedViews.findAll { it != null }
+        println "elems"+elems;
         String viewPrefix = elems.collect { "view/${it}" }.join('/')
 
         if (viewPrefix) return "$viewPrefix/$pathSuffix"
@@ -147,6 +181,7 @@ void startJob(String jobName) {
 
         try {
             response = restClient.get(map)
+           /// response.
         } catch (HttpHostConnectException ex) {
             println "Unable to connect to host: $jenkinsServerUrl"
             throw ex
@@ -188,6 +223,7 @@ void startJob(String jobName) {
             }
             catch (HttpResponseException e) {
                 if (e.response?.status == 404) {
+                    println "exceotuin"+e;
                     println "Couldn't find crumbIssuer for jenkins. Just moving on it may not be needed."
                 }
                 else {
