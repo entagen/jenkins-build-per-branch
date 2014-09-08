@@ -162,7 +162,7 @@ class JenkinsJobManager {
         List<String> allJobNames = jenkinsApi.jobNames
 
         // ensure that there is at least one job matching the template pattern, collect the set of template jobs
-        List<TemplateJob> templateJobs = findRequiredTemplateJobs(allJobNames)
+        List<TemplateJob> templateJobs = findRequiredTemplateJobs(allJobNames, templateJobPrefix)
 
         // create any missing template jobs and delete any jobs matching the template patterns that no longer have branches
         syncJobs(allBranchNames, allJobNames, templateJobs)
@@ -236,6 +236,31 @@ class JenkinsJobManager {
         assert templateJobs?.size() > 0, "Unable to find any jobs matching template regex: $regex\nYou need at least one job to match the templateJobPrefix and templateBranchName suffix arguments"
         return templateJobs
     }
+
+
+    List<TemplateJob> findRequiredTemplateJobs(List<String> allJobNames, String templateJobName) {
+        String regex = /^($templateJobPrefix-[^-]*)-($templateBranchName)$/
+
+
+        List<TemplateJob> templateJobs = allJobNames.findResults { String jobName ->
+            TemplateJob templateJob = null
+            jobName.contains(templateJobName)
+            { full, baseJobName, branchName ->
+                templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: branchName)
+            }
+            return templateJob
+        }
+
+      /*
+        for(int i=0;i<allJobNames.size();i++) {
+            if(allJobNames.get(i).contains(templateJobName)) templateJobs.add(allJobNames.get(i));
+
+
+        }*/
+        assert templateJobs?.size() > 0, "Unable to find any jobs matching template regex: $regex\nYou need at least one job to match the templateJobPrefix and templateBranchName suffix arguments"
+        return templateJobs
+    }
+
 
     public void syncViews(List<String> allBranchNames) {
         List<String> existingViewNames = jenkinsApi.getViewNames(this.nestedView)
