@@ -25,6 +25,52 @@ class JenkinsJobManager {
 
     JenkinsApi jenkinsApi
     GitApi gitApi
+    String repo;
+    String org;
+    String rootFolder="Git-Structure";
+    String getOrg() {
+        String git=gitUrl.substring(12);
+
+        int first = git.indexOf('/');
+        int second=git.indexOf('/',first+1);
+
+        return git.substring(first+1,second);
+
+
+    }
+    String getRepo() {
+        String git=gitUrl.substring(12);
+        int first = git.indexOf('/');
+        int second=git.indexOf('/',first+1);
+        return git.substring(second+1,git.length()-4);
+
+    }
+    boolean checkRepoPresent() {
+
+        String url="http://build1004.scm.corp.wc1.inmobi.com/view/Git-Structure/view/"+getOrg()+"/view/"+getRepo();
+        System.out.println("checking path => "+ "view/Git-Structure/view/"+getOrg()+"/view/"+getRepo());
+
+        try {
+
+            String testurl="http://build1004.scm.corp.wc1.inmobi.com/view/Git-Structure/view/"+getOrg()+"/view/"+getRepo()+"/newJob";
+            URL u = new URL(testurl);
+            HttpURLConnection huc = (HttpURLConnection) u.openConnection();
+            huc.setRequestMethod("HEAD");
+            if (huc.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                System.out.println("response code  => " + huc.getResponseCode() + " not found " + url);
+                return false;
+            } else {
+                System.out.println("response code => " + huc.getResponseCode() + " " + url);
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+
+        }
+
+
+    }
 
 
     public void restartJenkins()
@@ -33,76 +79,6 @@ class JenkinsJobManager {
         Thread.sleep(5000);
 
     }
-    public String readFile(String filePath) {
-        String result = "";
-        try {
-
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(
-                    filePath));
-            String line = "";
-
-            while ((line = bufferedReader.readLine()) != null) {
-                result = result + line + "\n";
-            }
-
-        } catch (Exception e) {
-
-        }
-        return result;
-    }
-
-    public void config(String filePath, String pattern1,String pattern2, String toInsert) {
-        // now edit the file
-        // now add the first part
-        // find the <builders> tag
-
-        try {
-            FileReader fileReader = new FileReader(filePath);
-            String line = "";
-            int count = 0;
-            boolean end = false;
-            String prefix = "";
-            String suffix = "";
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            // line.con
-
-            while ((line = bufferedReader.readLine()) != null) {
-                if(line.contains(pattern1)) {
-                    prefix = prefix + line + "\n";
-                    break;
-                }
-                else {
-                    prefix = prefix + line + "\n";
-                }
-            }
-            while ((line = bufferedReader.readLine()) != null) {
-                if (line.contains(pattern2)) {
-                    end = true;
-                    prefix = prefix + line + "\n";
-                    continue;
-                }
-                if (end)
-                    suffix = suffix + line + "\n";
-                else
-                    prefix = prefix + line + "\n";
-
-            }
-            System.out.println("prefix" + prefix);
-            System.out.println("toinsert" + toInsert);
-            System.out.println("suffix" + suffix);
-            FileWriter fileWriter = new FileWriter(filePath);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(prefix + toInsert + suffix);
-            bufferedWriter.close();
-
-        } catch (Exception e) {
-
-        }
-
-        // then add the line f
-
-    }
-
 
     JenkinsJobManager(Map props) {
         for (property in props) {
@@ -147,9 +123,9 @@ class JenkinsJobManager {
     public void createRepo(String rootFolder, String org, String repoName) {
         // need to create listView in org
         // this can be done with existing functions
-       createOrg(rootFolder,org);
+      // createOrg(rootFolder,org);
        // restartJenkins();
-      //  jenkinsApi.createView(repoName,rootFolder,org);
+        jenkinsApi.createView(repoName,rootFolder,org);
 
 
 
@@ -159,9 +135,14 @@ class JenkinsJobManager {
 
 
     public void testFunction() {
-        System.out.println(jenkinsApi.getJobNames("Vivek"));
+      //  System.out.println(jenkinsApi.getJobNames("Vivek"));
+        if(!checkRepoPresent()) {
+
+            createRepo("Git-Structure",getOrg(),getRepo());
+        }
+
        // restartJenkins();
-        createRepo("nestedtype_git","nested_org3","testrepo1");
+       // createRepo("nestedtype_git","nested_org3","testrepo1");
 
        // System.out.println(jenkinsApi.getJobConfig("VivekTestSyncYOURPROJECTGitBranchesWithJenkins"));
         //jenkinsApi.cre
@@ -209,7 +190,7 @@ class JenkinsJobManager {
 
         for(ConcreteJob missingJob in missingJobs) {
             println "Creating missing job: ${missingJob.jobName} from ${missingJob.templateJob.jobName}"
-            jenkinsApi.cloneJobForBranch(missingJob, templateJobs)
+            jenkinsApi.cloneJobForBranch(missingJob, templateJobs,rootFolder,getOrg(),getRepo());
             if (startOnCreate) {
                 jenkinsApi.startJob(missingJob)
             }
@@ -316,4 +297,75 @@ class JenkinsJobManager {
 
         return this.gitApi
     }
+    public String readFile(String filePath) {
+        String result = "";
+        try {
+
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(
+                    filePath));
+            String line = "";
+
+            while ((line = bufferedReader.readLine()) != null) {
+                result = result + line + "\n";
+            }
+
+        } catch (Exception e) {
+
+        }
+        return result;
+    }
+
+    public void config(String filePath, String pattern1,String pattern2, String toInsert) {
+        // now edit the file
+        // now add the first part
+        // find the <builders> tag
+
+        try {
+            FileReader fileReader = new FileReader(filePath);
+            String line = "";
+            int count = 0;
+            boolean end = false;
+            String prefix = "";
+            String suffix = "";
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            // line.con
+
+            while ((line = bufferedReader.readLine()) != null) {
+                if(line.contains(pattern1)) {
+                    prefix = prefix + line + "\n";
+                    break;
+                }
+                else {
+                    prefix = prefix + line + "\n";
+                }
+            }
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.contains(pattern2)) {
+                    end = true;
+                    prefix = prefix + line + "\n";
+                    continue;
+                }
+                if (end)
+                    suffix = suffix + line + "\n";
+                else
+                    prefix = prefix + line + "\n";
+
+            }
+            System.out.println("prefix" + prefix);
+            System.out.println("toinsert" + toInsert);
+            System.out.println("suffix" + suffix);
+            FileWriter fileWriter = new FileWriter(filePath);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(prefix + toInsert + suffix);
+            bufferedWriter.close();
+
+        } catch (Exception e) {
+
+        }
+
+        // then add the line f
+
+    }
+
+
 }
