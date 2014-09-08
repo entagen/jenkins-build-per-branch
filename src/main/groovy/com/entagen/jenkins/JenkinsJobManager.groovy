@@ -1,6 +1,11 @@
 package com.entagen.jenkins
 
 import java.util.regex.Pattern
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.*;
+//import org.jvnet.hudson.test.HudsonTestCase;
 
 class JenkinsJobManager {
     String templateJobPrefix
@@ -21,6 +26,74 @@ class JenkinsJobManager {
     JenkinsApi jenkinsApi
     GitApi gitApi
 
+
+    public void restartJenkins()
+    {
+        Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
+        Thread.sleep(5000);
+
+    }
+    public String readFile(String filePath) {
+        String result = "";
+        try {
+
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(
+                    filePath));
+            String line = "";
+
+            while ((line = bufferedReader.readLine()) != null) {
+                result = result + line + "\n";
+            }
+
+        } catch (Exception e) {
+
+        }
+        return result;
+    }
+
+    public void config(String filePath, String pattern, String toInsert) {
+        // now edit the file
+        // now add the first part
+        // find the <builders> tag
+
+        try {
+            FileReader fileReader = new FileReader(filePath);
+            String line = "";
+            int count = 0;
+            boolean end = false;
+            String prefix = "";
+            String suffix = "";
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            // line.con
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.contains(pattern)) {
+                    end = true;
+                    prefix = prefix + line + "\n";
+                    continue;
+                }
+                if (end)
+                    suffix = suffix + line + "\n";
+                else
+                    prefix = prefix + line + "\n";
+
+            }
+            System.out.println("prefix" + prefix);
+            System.out.println("toinsert" + toInsert);
+            System.out.println("suffix" + suffix);
+            FileWriter fileWriter = new FileWriter(filePath);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(prefix + toInsert + suffix);
+            bufferedWriter.close();
+
+        } catch (Exception e) {
+
+        }
+
+        // then add the line f
+
+    }
+
+
     JenkinsJobManager(Map props) {
         for (property in props) {
             this."${property.key}" = property.value
@@ -32,15 +105,61 @@ class JenkinsJobManager {
 
     }
 
+
+
+    public void createOrg(String rootFolder, String org) {
+        // need to create a nestedType view in org
+        // first find the org
+        // then <views>
+        // then add the code
+        String fileRead=readFile("/d0/jenkins/config.xml");
+        String toInsert=" <hudson.plugins.nested__view.NestedView>\n" +
+                "          <owner class=\"hudson.plugins.nested_view.NestedView\" reference=\"../../..\"/>\n" +
+                "          <name>"+org+"</name>\n" +
+                "          <filterExecutors>false</filterExecutors>\n" +
+                "          <filterQueue>false</filterQueue>\n" +
+                "          <properties class=\"hudson.model.View$PropertyList\"/>\n" +
+                "          <views/>\n" +
+                "          <columns>\n" +
+                "            <columns/>\n" +
+                "          </columns>\n" +
+                "        </hudson.plugins.nested__view.NestedView>";
+       if(!fileRead.contains(org)) {
+           config("/d0/jenkins/config.xml", rootFolder, toInsert);
+           restartJenkins();
+       }
+
+        //for this we need to write the file handing program
+
+
+    }
+    public void createRepo(String rootFolder, String org, String repoName) {
+        // need to create listView in org
+        // this can be done with existing functions
+        createOrg(rootFolder,org);
+        jenkinsApi.createView(repoName,rootFolder,org);
+
+
+
+    }
+
+
+
+
     public void testFunction() {
-       // System.out.println(jenkinsApi.getJobNames("Vivek"));
+        System.out.println(jenkinsApi.getJobNames("Vivek"));
+        createRepo("nestedtype_git","nested_org2","testrepo1");
+
        // System.out.println(jenkinsApi.getJobConfig("VivekTestSyncYOURPROJECTGitBranchesWithJenkins"));
         //jenkinsApi.cre
-        jenkinsApi.startJob("VivekTestSyncYOURPROJECTGitBranchesWithJenkins");
+       // jenkinsApi.startJob("VivekTestSyncYOURPROJECTGitBranchesWithJenkins");
        // BranchView branchView = new BranchView("","GraphiteDasboards/tree/master");
        //jenkinsApi.createViewForBranch(branchView,"");
        // jenkinsApi.createViewForBranch("branchView");
+       // jenkinsApi.createView("org3");
+        //println(jenkinsApi.getViewNames("test"));
 
+        //WebClient wc = new WebClient();
 
     }
 
