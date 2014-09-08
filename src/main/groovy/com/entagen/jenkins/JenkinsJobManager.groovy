@@ -118,7 +118,7 @@ class JenkinsJobManager {
                 "          <name>"+org+"</name>\n" +
                 "          <filterExecutors>false</filterExecutors>\n" +
                 "          <filterQueue>false</filterQueue>\n" +
-                "          <properties class=\"hudson.model.View$PropertyList\"/>\n" +
+                "          <properties class=\"hudson.model.View\$PropertyList\"/>\n" +
                 "          <views/>\n" +
                 "          <columns>\n" +
                 "            <columns/>\n" +
