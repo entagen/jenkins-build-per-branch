@@ -57,6 +57,27 @@ class JenkinsApi {
             post('job/' + missingJob.jobName + '/enable')
         }
     }
+
+
+
+
+    void cloneJobForBranch(ConcreteJob missingJob, List<TemplateJob> templateJobs, String rootFolder, String org,String repo) {
+        String missingJobConfig = configForMissingJob(missingJob, templateJobs)
+        TemplateJob templateJob = missingJob.templateJob
+
+        //Copy job with jenkins copy job api, this will make sure jenkins plugins get the call to make a copy if needed (promoted builds plugin needs this)
+        // buildJobPath("createItem","Git")
+        //post('createItem', missingJobConfig, [name: missingJob.jobName, mode: 'copy', from: templateJob.jobName], ContentType.XML)
+        post(buildJobPath("createItem", rootFolder,org,repo), missingJobConfig, [name: missingJob.jobName, mode: 'copy', from: templateJob.jobName], ContentType.XML)
+// "nestedtype_git","nestedtype_org","repo"
+        post('job/' + missingJob.jobName + "/config.xml", missingJobConfig, [:], ContentType.XML)
+        //Forced disable enable to work around Jenkins' automatic disabling of clones jobs
+        //But only if the original job was enabled
+        post('job/' + missingJob.jobName + '/disable')
+        if (!missingJobConfig.contains("<disabled>true</disabled>")) {
+            post('job/' + missingJob.jobName + '/enable')
+        }
+    }
 void startJob(String jobName) {
     println "Starting job"+ jobName
     post('job/' +jobName + '/build')
