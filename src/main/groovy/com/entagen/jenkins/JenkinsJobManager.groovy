@@ -136,7 +136,8 @@ class JenkinsJobManager {
     public void createRepo(String rootFolder, String org, String repoName) {
         // need to create listView in org
         // this can be done with existing functions
-        createOrg(rootFolder,org);
+        //createOrg(rootFolder,org);
+        restartJenkins();
         jenkinsApi.createView(repoName,rootFolder,org);
 
 
@@ -148,7 +149,8 @@ class JenkinsJobManager {
 
     public void testFunction() {
         System.out.println(jenkinsApi.getJobNames("Vivek"));
-        createRepo("nestedtype_git","nested_org3","testrepo1");
+        restartJenkins();
+       // createRepo("nestedtype_git","nested_org3","testrepo1");
 
        // System.out.println(jenkinsApi.getJobConfig("VivekTestSyncYOURPROJECTGitBranchesWithJenkins"));
         //jenkinsApi.cre
