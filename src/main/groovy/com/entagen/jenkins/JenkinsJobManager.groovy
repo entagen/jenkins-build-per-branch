@@ -148,7 +148,7 @@ class JenkinsJobManager {
 
     public void testFunction() {
         System.out.println(jenkinsApi.getJobNames("Vivek"));
-        createRepo("nestedtype_git","nested_org2","testrepo2");
+        createRepo("nestedtype_git","nested_org3","testrepo1");
 
        // System.out.println(jenkinsApi.getJobConfig("VivekTestSyncYOURPROJECTGitBranchesWithJenkins"));
         //jenkinsApi.cre
