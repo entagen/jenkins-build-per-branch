@@ -34,7 +34,7 @@ class Main {
         Map<String, String> argsMap = parseArgs(args)
        // showConfiguration(argsMap)
         JenkinsJobManager manager = new JenkinsJobManager(argsMap)
-       manager.syncWithRepo()
+      // manager.syncWithRepo()
     }
 
     public static Map<String, String> parseArgs(String[] args) {
