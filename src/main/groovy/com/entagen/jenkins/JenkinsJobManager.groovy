@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.*;
+
+import groovyx.net.http.ContentType
 //import org.jvnet.hudson.test.HudsonTestCase;
 
 class JenkinsJobManager {
@@ -132,14 +134,34 @@ class JenkinsJobManager {
     }
 
 
+void createJob(String jobName, String jobTemplate) {
 
+    }
 
     public void testFunction() {
       //  System.out.println(jenkinsApi.getJobNames("Vivek"));
-        if(!checkRepoPresent()) {
+      /*  if(!checkRepoPresent()) {
 
             createRepo("Git-Structure",getOrg(),getRepo());
-        }
+        }*/
+        // 1) get the list of branches
+    //  List<String> branchNameList= println(gitApi.getBranchNames());
+      //  println jenkinsApi.getJobConfig("sandbox-cyclops-Dev_job-develop");
+        String config= jenkinsApi.getJobConfig("sandbox-cyclops-Dev_job-develop");
+       // post(jenkinsApi.buildJobPath("createItem", rootFolder,getOrg(),getRepo()), config, [name: "testJob", mode: 'copy', from: "sandbox-cyclops-Dev_job-develop"], ContentType.XML)
+        //'createItem'
+        String jobname='vivek';
+        String jobTemplate='test_generator';
+        post('createItem', config, [name: jobname, mode: 'copy', from: jobTemplate], ContentType.XML)
+        post('job/' + jobName + "/config.xml", config, [:], ContentType.XML)
+
+
+        // for each branch name create a job
+       // from copy job
+
+
+        // 2) create job for each branch
+
 
        // restartJenkins();
        // createRepo("nestedtype_git","nested_org3","testrepo1");
@@ -176,13 +198,20 @@ class JenkinsJobManager {
 
     public void syncJobs(List<String> allBranchNames, List<String> allJobNames, List<TemplateJob> templateJobs) {
         List<String> currentTemplateDrivenJobNames = templateDrivenJobNames(templateJobs, allJobNames)
+
         List<String> nonTemplateBranchNames = allBranchNames - templateBranchName
         List<ConcreteJob> expectedJobs = this.expectedJobs(templateJobs, nonTemplateBranchNames)
+        println 'currentTemplateDrivenJobNames';
+        println currentTemplateDrivenJobNames;
+        println 'nonTemplateBranchNames';
+        println nonTemplateBranchNames;
+        println 'expectedJobs';
+        println expectedJobs;
 
-        createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
+       /* createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
         if (!noDelete) {
             deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
-        }
+        }*/
     }
 
     public void createMissingJobs(List<ConcreteJob> expectedJobs, List<String> currentJobs, List<TemplateJob> templateJobs) {
@@ -241,7 +270,7 @@ class JenkinsJobManager {
 
     List<TemplateJob> findRequiredTemplateJobs(List<String> allJobNames, String templateJobName) {
         String regex = /^($templateJobPrefix-[^-]*)-($templateBranchName)$/
-        regex=/$templateJobPrefix/
+        regex = ~/$templateJobPrefix/;
 
 
         List<TemplateJob> templateJobs = allJobNames.findResults { String jobName ->
