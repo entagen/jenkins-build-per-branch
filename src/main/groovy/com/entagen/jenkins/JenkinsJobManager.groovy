@@ -172,7 +172,7 @@ void createJob(String jobName, String jobTemplate) {
 
 
    List<String> jobList=  jenkinsApi.getJobNames("");
-        createOrg(rootFolder,org);
+        createOrg(rootFolder,getOrg());
        if(!checkRepoPresent()) {
            println "creating repo";
 
