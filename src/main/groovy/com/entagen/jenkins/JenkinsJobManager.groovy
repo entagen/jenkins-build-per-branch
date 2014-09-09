@@ -1,12 +1,12 @@
 package com.entagen.jenkins
-
+import groovyx.net.http.ContentType
 import java.util.regex.Pattern
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.*;
 
-import groovyx.net.http.ContentType
+
 //import org.jvnet.hudson.test.HudsonTestCase;
 
 class JenkinsJobManager {
@@ -19,6 +19,7 @@ class JenkinsJobManager {
     String jenkinsUser
     String jenkinsPassword
     String test;
+    String jobPrefix;
     
     Boolean dryRun = false
     Boolean noViews = false
@@ -78,9 +79,20 @@ class JenkinsJobManager {
     public void restartJenkins()
     {
         Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
-        Thread.sleep(5000);
+      //  Thread.sleep(5000);
 
     }
+
+    public void reload()
+    {
+       // Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
+        jenkinsApi.post('reload/');
+        sleep(1000);
+       // Thread.sleep(5000);
+
+
+    }
+
 
     JenkinsJobManager(Map props) {
         for (property in props) {
@@ -88,6 +100,8 @@ class JenkinsJobManager {
         }
         initJenkinsApi()
         initGitApi()
+        createOrg( rootFolder,  getOrg());
+
         testFunction()
 
 
@@ -100,7 +114,9 @@ class JenkinsJobManager {
         // first find the org
         // then <views>
         // then add the code
-        String fileRead=readFile("/d0/jenkins/config.xml");
+        String filename="/tmp/config.xml";
+       // filename="/d0/jenkins/config.xml";
+        String fileRead=readFile(filename);
         String toInsert=" <hudson.plugins.nested__view.NestedView>\n" +
                 "          <owner class=\"hudson.plugins.nested_view.NestedView\" reference=\"../../..\"/>\n" +
                 "          <name>"+org+"</name>\n" +
@@ -113,8 +129,10 @@ class JenkinsJobManager {
                 "          </columns>\n" +
                 "        </hudson.plugins.nested__view.NestedView>";
        if(!fileRead.contains(org)) {
-           config("/d0/jenkins/config.xml",rootFolder,"<views>", toInsert);
-           restartJenkins();
+           config(filename,rootFolder,"<views>", toInsert);
+
+
+           //restartJenkins();
 
        }
 
@@ -139,21 +157,48 @@ void createJob(String jobName, String jobTemplate) {
     }
 
     public void testFunction() {
-      //  System.out.println(jenkinsApi.getJobNames("Vivek"));
-      /*  if(!checkRepoPresent()) {
+
+
+
+   List<String> jobList=  jenkinsApi.getJobNames("");
+       if(!checkRepoPresent()) {
+           println "creating repo";
 
             createRepo("Git-Structure",getOrg(),getRepo());
-        }*/
+        }
         // 1) get the list of branches
-    //  List<String> branchNameList= println(gitApi.getBranchNames());
+      List<String> branchNameList= gitApi.getBranchNames();
       //  println jenkinsApi.getJobConfig("sandbox-cyclops-Dev_job-develop");
-        String config= jenkinsApi.getJobConfig("sandbox-cyclops-Dev_job-develop");
+        String config= jenkinsApi.getJobConfig(templateJobPrefix);
        // post(jenkinsApi.buildJobPath("createItem", rootFolder,getOrg(),getRepo()), config, [name: "testJob", mode: 'copy', from: "sandbox-cyclops-Dev_job-develop"], ContentType.XML)
         //'createItem'
-        String jobname='vivek';
-        String jobTemplate='test_generator';
-        post('createItem', config, [name: jobname, mode: 'copy', from: jobTemplate], ContentType.XML)
-        post('job/' + jobName + "/config.xml", config, [:], ContentType.XML)
+        String jobName;
+
+        for(int i=0;i<branchNameList.size();i++) {
+            String branchName=branchNameList.get(i);
+          //  branchName.replaceAll('/', '_')
+             jobName=jobPrefix+ branchName.replaceAll('/', '_');
+            config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
+            config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
+            config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
+            println config;
+            if(!jobList.contains(jobName)) {
+                println "creating job : "+jobName;
+                config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
+                //config.repl
+
+
+              //  config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
+                //config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
+                println config;
+               // jenkinsApi.post(jenkinsApi.buildJobPath("createItem", rootFolder, getOrg(), getRepo()), config, [name: jobName, mode: 'copy', from: templateJobPrefix], ContentType.XML)
+            }
+            break;
+
+        }
+
+
+        //jenkinsApi.post('job/' + jobname + "/config.xml", config, [:], ContentType.XML)
 
 
         // for each branch name create a job
