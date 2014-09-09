@@ -87,7 +87,7 @@ class JenkinsJobManager {
     {
        // Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
         jenkinsApi.post('reload/');
-        sleep(1000);
+        sleep(10000);
        // Thread.sleep(5000);
 
 
@@ -130,6 +130,7 @@ class JenkinsJobManager {
                 "        </hudson.plugins.nested__view.NestedView>";
        if(!fileRead.contains(org)) {
            config(filename,rootFolder,"<views>", toInsert);
+           reload();
 
 
            //restartJenkins();
