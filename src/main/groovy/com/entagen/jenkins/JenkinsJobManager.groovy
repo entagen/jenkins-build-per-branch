@@ -477,7 +477,7 @@ void createJob(String jobName, String jobTemplate) {
                 else {
                     if (!last.trim().compareTo(line.trim()) != 0) {
                         prefix = prefix + line + "\n";
-                        last=prefix;
+                        last=line;
                     }
                 }
             }
