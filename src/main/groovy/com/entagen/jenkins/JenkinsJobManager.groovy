@@ -36,16 +36,19 @@ class JenkinsJobManager {
 
         int first = git.indexOf('/');
         int second=git.indexOf('/',first+1);
+        println "org"+org;
 
         return git.substring(first+1,second);
 
 
     }
     String getRepo() {
+        println "gitul"+gitUrl;
         String git=gitUrl.substring(12);
         int first = git.indexOf('/');
         int second=git.indexOf('/',first+1);
-        return git.substring(second+1,git.length()-4);
+        println "org"+repo;
+        return git.substring(second+1,git.length());
 
     }
     boolean checkRepoPresent() {
@@ -101,7 +104,9 @@ class JenkinsJobManager {
         }
         initJenkinsApi()
         initGitApi()
-        createOrg( rootFolder,  getOrg());
+        org=getOrg();
+        repo=getRepo();
+        //createOrg( rootFolder,  getOrg());
 
         testFunction();
 
@@ -111,7 +116,7 @@ class JenkinsJobManager {
 
 
     public void createOrg(String rootFolder, String org) {
-        reload();
+        //reload();
         // need to create a nestedType view in org
         // first find the org
         // then <views>
