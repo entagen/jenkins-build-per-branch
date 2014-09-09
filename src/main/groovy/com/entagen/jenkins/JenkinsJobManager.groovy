@@ -115,7 +115,7 @@ class JenkinsJobManager {
         // then <views>
         // then add the code
         String filename="/tmp/config.xml";
-       // filename="/d0/jenkins/config.xml";
+        filename="/d0/jenkins/config.xml";
         String fileRead=readFile(filename);
         String toInsert=" <hudson.plugins.nested__view.NestedView>\n" +
                 "          <owner class=\"hudson.plugins.nested_view.NestedView\" reference=\"../../..\"/>\n" +
