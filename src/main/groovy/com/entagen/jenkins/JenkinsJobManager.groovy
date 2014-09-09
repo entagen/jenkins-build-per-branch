@@ -475,7 +475,10 @@ void createJob(String jobName, String jobTemplate) {
                     break;
                 }
                 else {
-                    prefix = prefix + line + "\n";
+                    if (!last.trim().compareTo(line.trim()) != 0) {
+                        prefix = prefix + line + "\n";
+                        last=prefix;
+                    }
                 }
             }
             while ((line = bufferedReader.readLine()) != null) {
