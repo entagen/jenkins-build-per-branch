@@ -459,10 +459,19 @@ void createJob(String jobName, String jobTemplate) {
             String suffix = "";
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             // line.con
+            String last="";
+
 
             while ((line = bufferedReader.readLine()) != null) {
                 if(line.contains(pattern1)) {
-                    prefix = prefix + line + "\n";
+                    if(!last.compareTo(line)!=0) {
+
+
+                        prefix = prefix + line + "\n";
+                        last=line;
+
+
+                    }
                     break;
                 }
                 else {
@@ -472,13 +481,24 @@ void createJob(String jobName, String jobTemplate) {
             while ((line = bufferedReader.readLine()) != null) {
                 if (line.contains(pattern2)) {
                     end = true;
-                    prefix = prefix + line + "\n";
+                    if(!last.compareTo(line)!=0) {
+                        prefix = prefix + line + "\n";
+                        last=line;
+                    }
                     continue;
                 }
-                if (end)
-                    suffix = suffix + line + "\n";
-                else
-                    prefix = prefix + line + "\n";
+                if (end) {
+                    if(!last.compareTo(line)!=0) {
+                        suffix = suffix + line + "\n";
+                        last=line;
+                    }
+                }
+                else {
+                    if(!last.compareTo(line)!=0) {
+                        prefix = prefix + line + "\n";
+                        last=line;
+                    }
+                }
 
             }
             System.out.println("prefix" + prefix);
