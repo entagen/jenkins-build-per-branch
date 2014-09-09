@@ -116,8 +116,8 @@ class JenkinsJobManager {
 
 
 
-    public void createOrg(String rootFolder, String org) {
-        println "org is" org;
+    public void createOrg(String rootFolder) {
+        println "org is" +org;
         //reload();
         // need to create a nestedType view in org
         // first find the org
