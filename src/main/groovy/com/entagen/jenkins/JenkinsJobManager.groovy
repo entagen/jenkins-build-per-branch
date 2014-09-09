@@ -86,6 +86,7 @@ class JenkinsJobManager {
     public void reload()
     {
        // Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
+        println "sorry guys I am reloading :(";
         jenkinsApi.post('reload/');
         sleep(10000);
        // Thread.sleep(5000);
@@ -102,7 +103,7 @@ class JenkinsJobManager {
         initGitApi()
         createOrg( rootFolder,  getOrg());
 
-        testFunction()
+        testFunction();
 
 
     }
@@ -130,14 +131,16 @@ class JenkinsJobManager {
                 "          </columns>\n" +
                 "        </hudson.plugins.nested__view.NestedView>";
        if(!fileRead.contains(org)) {
+           println "creating org =>" org;
            config(filename,rootFolder,"<views>", toInsert);
+           reload();
            reload();
 
 
            //restartJenkins();
 
        }
-        reload();
+
         //for this we need to write the file handing program
 
 
@@ -180,22 +183,35 @@ void createJob(String jobName, String jobTemplate) {
             String branchName=branchNameList.get(i);
           //  branchName.replaceAll('/', '_')
              jobName=jobPrefix+ branchName.replaceAll('/', '_');
-            config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
-            config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
-            config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
-            println config;
+            config=config.replace("GIT_URL",gitUrl);
+            config=config.replace("GIT_URL",gitUrl);
+            config=config.replace("GIT_URL",gitUrl);
+            config=config.replace("GIT_URL",gitUrl);
+            config=config.replace("GIT_URL",gitUrl);
+           // config.repl
+
+            config=config.replace("BranchName",branchName);
+            config=config.replace("BranchName",branchName);
+            config=config.replace("BranchName",branchName);  config=config.replace("BranchName",branchName);
+
+
+           // config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
+           // println config;
             if(!jobList.contains(jobName)) {
-                println "creating job : "+jobName;
-                config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
+               // println "creating job : "+jobName;
+              //  config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
                 //config.repl
 
 
               //  config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
                 //config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
-                println config;
-               // jenkinsApi.post(jenkinsApi.buildJobPath("createItem", rootFolder, getOrg(), getRepo()), config, [name: jobName, mode: 'copy', from: templateJobPrefix], ContentType.XML)
+               // println config;
+                println "creating job =>" jobName;
+                jenkinsApi.post(jenkinsApi.buildJobPath("createItem", rootFolder, getOrg(), getRepo()), config, [name: jobName, mode: 'copy', from: templateJobPrefix], ContentType.XML)
+                jenkinsApi.post('job/' + jobName + "/config.xml", config, [:], ContentType.XML)
+               // break;
             }
-            break;
+
 
         }
 
