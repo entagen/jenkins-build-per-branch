@@ -215,7 +215,7 @@ void createJob(String jobName, String jobTemplate) {
               //  config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
                 //config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
                // println config;
-                println "creating job =>" jobName;
+                println "creating job =>"+ jobName;
                 jenkinsApi.post(jenkinsApi.buildJobPath("createItem", rootFolder, getOrg(), getRepo()), config, [name: jobName, mode: 'copy', from: templateJobPrefix], ContentType.XML)
                 jenkinsApi.post('job/' + jobName + "/config.xml", config, [:], ContentType.XML)
                // break;
