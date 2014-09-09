@@ -106,6 +106,7 @@ class JenkinsJobManager {
         initGitApi()
         org=getOrg();
         repo=getRepo();
+        println "org+repo" +org+repo;
         //createOrg( rootFolder,  getOrg());
 
         testFunction();
