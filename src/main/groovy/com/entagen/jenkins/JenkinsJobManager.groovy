@@ -88,7 +88,7 @@ class JenkinsJobManager {
        // Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
         println "sorry guys I am reloading :(";
         jenkinsApi.post('reload/');
-        sleep(10000);
+        sleep(30000);
        // Thread.sleep(5000);
 
 
@@ -134,7 +134,7 @@ class JenkinsJobManager {
            println "creating org =>" org;
            config(filename,rootFolder,"<views>", toInsert);
            reload();
-           reload();
+          // reload();
 
 
            //restartJenkins();
