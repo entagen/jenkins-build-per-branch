@@ -164,6 +164,7 @@ class JenkinsJobManager {
         // ensure that there is at least one job matching the template pattern, collect the set of template jobs
         List<TemplateJob> templateJobs = findRequiredTemplateJobs(allJobNames, templateJobPrefix)
 
+
         // create any missing template jobs and delete any jobs matching the template patterns that no longer have branches
         syncJobs(allBranchNames, allJobNames, templateJobs)
 
@@ -240,11 +241,12 @@ class JenkinsJobManager {
 
     List<TemplateJob> findRequiredTemplateJobs(List<String> allJobNames, String templateJobName) {
         String regex = /^($templateJobPrefix-[^-]*)-($templateBranchName)$/
+        regex=/$templateJobPrefix/
 
 
         List<TemplateJob> templateJobs = allJobNames.findResults { String jobName ->
             TemplateJob templateJob = null
-            jobName.contains(templateJobName)
+            jobName.find(regex)
             { full, baseJobName, branchName ->
                 templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: branchName)
             }
