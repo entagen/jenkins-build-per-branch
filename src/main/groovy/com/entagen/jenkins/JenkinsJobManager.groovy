@@ -110,6 +110,7 @@ class JenkinsJobManager {
 
 
     public void createOrg(String rootFolder, String org) {
+        reload();
         // need to create a nestedType view in org
         // first find the org
         // then <views>
@@ -136,7 +137,7 @@ class JenkinsJobManager {
            //restartJenkins();
 
        }
-
+        reload();
         //for this we need to write the file handing program
 
 
