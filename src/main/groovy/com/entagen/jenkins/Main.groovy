@@ -10,6 +10,7 @@ class Main {
     public static final Map<String, Map<String, Object>> opts = [
             h: [longOpt: 'help', required: false, args: 0, argName: 'help', description: "Print usage information - gradle flag -Dhelp=true"],
             z: [longOpt: 'test', required: true, args: 1, argName: 'test', description: "test paramter"],
+            a: [longOpt: 'jobPrefix', required: true, args: 1, argName: 'jobPrefix', description: "jobPrefix paramter"],
             j: [longOpt: 'jenkins-url', required: true, args: 1, argName: 'jenkinsUrl', description: "Jenkins URL - gradle flag -DjenkinsUrl=<jenkinsUrl>"],
             u: [longOpt: 'git-url',  required: true, args: 1, argName: 'gitUrl', description: "Git Repository URL - gradle flag -DgitUrl=<gitUrl>"],
             p: [longOpt: 'job-prefix', required: true, args: 1, argName: 'templateJobPrefix', description: "Template Job Prefix, - gradle flag -DtemplateJobPrefix=<jobPrefix>"],
@@ -32,7 +33,7 @@ class Main {
         // test function to create a job in view1/view2
 
         Map<String, String> argsMap = parseArgs(args)
-       // showConfiguration(argsMap)
+        showConfiguration(argsMap)
         JenkinsJobManager manager = new JenkinsJobManager(argsMap)
       // manager.syncWithRepo()
     }
