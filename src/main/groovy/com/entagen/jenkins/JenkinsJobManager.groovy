@@ -126,7 +126,7 @@ class JenkinsJobManager {
         String filename="/tmp/config.xml";
         filename="/d0/jenkins/config.xml";
         String fileRead=readFile(filename);
-        String toInsert="   <hudson.plugins.nested__view.NestedView>\n" +
+        String toInsert="<hudson.plugins.nested__view.NestedView>\n" +
                 "          <owner class=\"hudson.plugins.nested_view.NestedView\" reference=\"../../..\"/>\n" +
                 "          <name>"+org+"</name>\n" +
                 "          <filterExecutors>false</filterExecutors>\n" +
@@ -136,7 +136,7 @@ class JenkinsJobManager {
                 "          <columns>\n" +
                 "            <columns/>\n" +
                 "          </columns>\n" +
-                "        </hudson.plugins.nested__view.NestedView>\n";
+                "</hudson.plugins.nested__view.NestedView>\n";
         println "configfile" +fileRead;
        if(!fileRead.contains("<name>"+org+"</name>")) {
            println "creating org =>" +org;
