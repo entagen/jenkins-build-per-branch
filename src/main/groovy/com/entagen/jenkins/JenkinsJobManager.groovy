@@ -139,7 +139,7 @@ class JenkinsJobManager {
                 "        </hudson.plugins.nested__view.NestedView>";
         println "configfile" +fileRead;
        if(!fileRead.contains(org)) {
-           println "creating org =>" org;
+           println "creating org =>" +org;
            config(filename,rootFolder,"<views>", toInsert);
            reload();
           // reload();
