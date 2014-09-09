@@ -192,16 +192,6 @@ void createJob(String jobName, String jobTemplate) {
             String branchName=branchNameList.get(i);
           //  branchName.replaceAll('/', '_')
              jobName=jobPrefix+ branchName.replaceAll('/', '_');
-            config=config.replace("GIT_URL",gitUrl);
-            config=config.replace("GIT_URL",gitUrl);
-            config=config.replace("GIT_URL",gitUrl);
-            config=config.replace("GIT_URL",gitUrl);
-            config=config.replace("GIT_URL",gitUrl);
-           // config.repl
-
-            config=config.replace("BranchName",branchName);
-            config=config.replace("BranchName",branchName);
-            config=config.replace("BranchName",branchName);  config=config.replace("BranchName",branchName);
 
 
            // config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
@@ -215,6 +205,18 @@ void createJob(String jobName, String jobTemplate) {
               //  config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
                 //config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
                // println config;
+                config= jenkinsApi.getJobConfig(templateJobPrefix);
+                config=config.replace("GIT_URL",gitUrl);
+                config=config.replace("GIT_URL",gitUrl);
+                config=config.replace("GIT_URL",gitUrl);
+                config=config.replace("GIT_URL",gitUrl);
+                config=config.replace("GIT_URL",gitUrl);
+                // config.repl
+
+                config=config.replace("BranchName",branchName);
+                config=config.replace("BranchName",branchName);
+                config=config.replace("BranchName",branchName);
+                config=config.replace("BranchName",branchName);
                 println "creating job =>"+ jobName;
                 jenkinsApi.post(jenkinsApi.buildJobPath("createItem", rootFolder, getOrg(), getRepo()), config, [name: jobName, mode: 'copy', from: templateJobPrefix], ContentType.XML)
                 jenkinsApi.post('job/' + jobName + "/config.xml", config, [:], ContentType.XML)
