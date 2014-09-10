@@ -464,21 +464,23 @@ void createJob(String jobName, String jobTemplate) {
 
             while ((line = bufferedReader.readLine()) != null) {
                 if(line.contains(pattern1)) {
-                    if(last.trim().compareTo(line.trim())!=0) {
+                    if((last.trim()).compareTo((line.trim()))!=0) {
 
 
                         prefix = prefix + line + "\n";
-                        last=line;
+
 
 
                     }
+                    last=line;
                     break;
                 }
                 else {
                     if (last.trim().compareTo(line.trim()) != 0) {
                         prefix = prefix + line + "\n";
-                        last=line;
+
                     }
+                    last=line;
                 }
             }
             while ((line = bufferedReader.readLine()) != null) {
@@ -486,21 +488,24 @@ void createJob(String jobName, String jobTemplate) {
                     end = true;
                     if(last.trim().compareTo(line.trim())!=0) {
                         prefix = prefix + line + "\n";
-                        last=line;
+
                     }
+                    last=line;
                     continue;
                 }
                 if (end) {
                     if(last.trim().compareTo(line.trim())!=0) {
                         suffix = suffix + line + "\n";
-                        last=line;
+
                     }
+                    last=line;
                 }
                 else {
                     if(last.trim().compareTo(line.trim())!=0) {
                         prefix = prefix + line + "\n";
-                        last=line;
+
                     }
+                    last=line;
                 }
 
             }
