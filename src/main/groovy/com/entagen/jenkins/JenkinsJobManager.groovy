@@ -171,11 +171,21 @@ void createJob(String jobName, String jobTemplate) {
 
     }
 
+  HashSet<String>  createJobSet(List<String> jobs) {
+      HashSet<String> uniqueJobs=new HashSet<String>();
+      for(int i=0;i<jobs.size();i++) {
+          String jobName=jobs.get(i);
+          uniqueJobs.add( jobName.toUpperCase());
+      }
+return uniqueJobs;
+    }
     public void testFunction() {
 
 
 
    List<String> jobList=  jenkinsApi.getJobNames("");
+        HashSet<String> uniqueJobs=createJobSet(jobList);
+       // for(int i=0;i<jo)
         createOrg(rootFolder);
        if(!checkRepoPresent()) {
            println "creating repo";
@@ -190,18 +200,21 @@ void createJob(String jobName, String jobTemplate) {
         //'createItem'
         String jobName;
 
+
         for(int i=0;i<branchNameList.size();i++) {
             String branchName=branchNameList.get(i);
           //  branchName.replaceAll('/', '_')
              jobName=jobPrefix+ branchName.replaceAll('/', '_');
 
 
+
            // config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
            // println config;
-            if(!jobList.contains(jobName)) {
+            if(!jobList.contains(jobName)&& !uniqueJobs.contains(jobName.toUpperCase())) {
                // println "creating job : "+jobName;
               //  config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
                 //config.repl
+                uniqueJobs.add(jobName.toUpperCase());
 
 
               //  config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
