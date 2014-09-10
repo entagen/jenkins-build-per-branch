@@ -159,6 +159,8 @@ class JenkinsJobManager {
       // createOrg(rootFolder,org);
        // restartJenkins();
         jenkinsApi.createView(repoName,rootFolder,org);
+        //reload();
+        sleep(10000);
 
 
 
