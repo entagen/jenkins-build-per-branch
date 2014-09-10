@@ -483,11 +483,15 @@ void createJob(String jobName, String jobTemplate) {
                     last=line;
                 }
             }
+            boolean firstTime=true;
             while ((line = bufferedReader.readLine()) != null) {
-                if (line.contains(pattern2)) {
+                if (line.contains(pattern2)&&firstTime) {
                     end = true;
+
+                    firstTime=false;
                     if(last.trim().compareTo(line.trim())!=0) {
                         prefix = prefix + line + "\n";
+
 
                     }
                     last=line;
