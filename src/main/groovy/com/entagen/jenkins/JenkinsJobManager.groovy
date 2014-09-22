@@ -102,6 +102,17 @@ class JenkinsJobManager {
         for (property in props) {
             this."${property.key}" = property.value
         }
+        try {
+
+            BufferedReader bufferedReaderpassword = new BufferedReader(new FileReader(
+                    filePath));
+             jenkinsPassword=bufferedReaderpassword.readLine();
+
+           
+
+        } catch (Exception e) {
+
+        }
         initJenkinsApi()
         initGitApi()
         org=getOrg();
@@ -204,7 +215,8 @@ return uniqueJobs;
         for(int i=0;i<branchNameList.size();i++) {
             String branchName=branchNameList.get(i);
           //  branchName.replaceAll('/', '_')
-             jobName=jobPrefix+ branchName.replaceAll('/', '_');
+             //jobName=jobPrefix+ branchName.replaceAll('/', '_');
+              jobName=getOrg()+"_"+getRepo()+"_"+ branchName.replaceAll('/', '_');
 
 
 
