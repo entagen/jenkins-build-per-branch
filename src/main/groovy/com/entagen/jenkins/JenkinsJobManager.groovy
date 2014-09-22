@@ -105,7 +105,7 @@ class JenkinsJobManager {
         try {
 
             BufferedReader bufferedReaderpassword = new BufferedReader(new FileReader(
-                    filePath));
+                    "/d0/jenkins/job_generator_cred"));
              jenkinsPassword=bufferedReaderpassword.readLine();
 
            
