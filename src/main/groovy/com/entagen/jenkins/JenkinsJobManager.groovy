@@ -46,7 +46,7 @@ class JenkinsJobManager {
     }
     boolean checkRepoPresent() {
 
-        String url=jenkinsUrl+"/view/Git-Structure/view/"+getOrg()+"/view/"+getRepo();
+        String url=jenkinsUrl+"view/Git-Structure/view/"+getOrg()+"/view/"+getRepo();
         System.out.println("checking path => "+ "view/Git-Structure/view/"+getOrg()+"/view/"+getRepo());
 
         try {
