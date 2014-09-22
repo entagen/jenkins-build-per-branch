@@ -1,12 +1,5 @@
 package com.entagen.jenkins
 import groovyx.net.http.ContentType
-import java.util.regex.Pattern
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.*;
-
-
 //import org.jvnet.hudson.test.HudsonTestCase;
 
 class JenkinsJobManager {
@@ -20,7 +13,7 @@ class JenkinsJobManager {
     String jenkinsPassword
     String test;
     String jobPrefix;
-    
+
     Boolean dryRun = false
     Boolean noViews = false
     Boolean noDelete = false
@@ -53,12 +46,12 @@ class JenkinsJobManager {
     }
     boolean checkRepoPresent() {
 
-        String url="http://build1004.scm.corp.wc1.inmobi.com/view/Git-Structure/view/"+getOrg()+"/view/"+getRepo();
+        String url=jenkinsUrl+"/view/Git-Structure/view/"+getOrg()+"/view/"+getRepo();
         System.out.println("checking path => "+ "view/Git-Structure/view/"+getOrg()+"/view/"+getRepo());
 
         try {
 
-            String testurl="http://build1004.scm.corp.wc1.inmobi.com/view/Git-Structure/view/"+getOrg()+"/view/"+getRepo()+"/newJob";
+            String testurl=jenkinsUrl+"view/Git-Structure/view/"+getOrg()+"/view/"+getRepo()+"/newJob";
             URL u = new URL(testurl);
             HttpURLConnection huc = (HttpURLConnection) u.openConnection();
             huc.setRequestMethod("HEAD");
@@ -82,17 +75,17 @@ class JenkinsJobManager {
     public void restartJenkins()
     {
         Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
-      //  Thread.sleep(5000);
+        //  Thread.sleep(5000);
 
     }
 
     public void reload()
     {
-       // Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
+        // Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
         println "sorry guys I am reloading :(";
         jenkinsApi.post('reload/');
         sleep(30000);
-       // Thread.sleep(5000);
+        // Thread.sleep(5000);
 
 
     }
@@ -106,9 +99,9 @@ class JenkinsJobManager {
 
             BufferedReader bufferedReaderpassword = new BufferedReader(new FileReader(
                     "/d0/jenkins/job_generator_cred"));
-             jenkinsPassword=bufferedReaderpassword.readLine();
+            jenkinsPassword=bufferedReaderpassword.readLine();
 
-           
+
 
         } catch (Exception e) {
 
@@ -149,16 +142,16 @@ class JenkinsJobManager {
                 "          </columns>\n" +
                 "</hudson.plugins.nested__view.NestedView>\n";
         println "configfile" +fileRead;
-       if(!fileRead.contains("<name>"+org+"</name>")) {
-           println "creating org =>" +org;
-           config(filename,rootFolder,"<views>", toInsert);
-           reload();
-          // reload();
+        if(!fileRead.contains("<name>"+org+"</name>")) {
+            println "creating org =>" +org;
+            config(filename,rootFolder,"<views>", toInsert);
+            reload();
+            // reload();
 
 
-           //restartJenkins();
+            //restartJenkins();
 
-       }
+        }
 
         //for this we need to write the file handing program
 
@@ -167,8 +160,8 @@ class JenkinsJobManager {
     public void createRepo(String rootFolder, String org, String repoName) {
         // need to create listView in org
         // this can be done with existing functions
-      // createOrg(rootFolder,org);
-       // restartJenkins();
+        // createOrg(rootFolder,org);
+        // restartJenkins();
         jenkinsApi.createView(repoName,rootFolder,org);
         //reload();
         sleep(10000);
@@ -178,60 +171,60 @@ class JenkinsJobManager {
     }
 
 
-void createJob(String jobName, String jobTemplate) {
+    void createJob(String jobName, String jobTemplate) {
 
     }
 
-  HashSet<String>  createJobSet(List<String> jobs) {
-      HashSet<String> uniqueJobs=new HashSet<String>();
-      for(int i=0;i<jobs.size();i++) {
-          String jobName=jobs.get(i);
-          uniqueJobs.add( jobName.toUpperCase());
-      }
-return uniqueJobs;
+    HashSet<String>  createJobSet(List<String> jobs) {
+        HashSet<String> uniqueJobs=new HashSet<String>();
+        for(int i=0;i<jobs.size();i++) {
+            String jobName=jobs.get(i);
+            uniqueJobs.add( jobName.toUpperCase());
+        }
+        return uniqueJobs;
     }
     public void testFunction() {
 
 
 
-   List<String> jobList=  jenkinsApi.getJobNames("");
+        List<String> jobList=  jenkinsApi.getJobNames("");
         HashSet<String> uniqueJobs=createJobSet(jobList);
-       // for(int i=0;i<jo)
+        // for(int i=0;i<jo)
         createOrg(rootFolder);
-       if(!checkRepoPresent()) {
-           println "creating repo";
+        if(!checkRepoPresent()) {
+            println "creating repo";
 
             createRepo("Git-Structure",getOrg(),getRepo());
         }
         // 1) get the list of branches
-      List<String> branchNameList= gitApi.getBranchNames();
-      //  println jenkinsApi.getJobConfig("sandbox-cyclops-Dev_job-develop");
+        List<String> branchNameList= gitApi.getBranchNames();
+        //  println jenkinsApi.getJobConfig("sandbox-cyclops-Dev_job-develop");
         String config= jenkinsApi.getJobConfig(templateJobPrefix);
-       // post(jenkinsApi.buildJobPath("createItem", rootFolder,getOrg(),getRepo()), config, [name: "testJob", mode: 'copy', from: "sandbox-cyclops-Dev_job-develop"], ContentType.XML)
+        // post(jenkinsApi.buildJobPath("createItem", rootFolder,getOrg(),getRepo()), config, [name: "testJob", mode: 'copy', from: "sandbox-cyclops-Dev_job-develop"], ContentType.XML)
         //'createItem'
         String jobName;
 
 
         for(int i=0;i<branchNameList.size();i++) {
             String branchName=branchNameList.get(i);
-          //  branchName.replaceAll('/', '_')
-             //jobName=jobPrefix+ branchName.replaceAll('/', '_');
-              jobName=getOrg()+"_"+getRepo()+"_"+ branchName.replaceAll('/', '_');
+            //  branchName.replaceAll('/', '_')
+            //jobName=jobPrefix+ branchName.replaceAll('/', '_');
+            jobName=getOrg()+"_"+getRepo()+"_"+ branchName.replaceAll('/', '_');
 
 
 
-           // config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
-           // println config;
+            // config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
+            // println config;
             if(!jobList.contains(jobName)&& !uniqueJobs.contains(jobName.toUpperCase())) {
-               // println "creating job : "+jobName;
-              //  config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
+                // println "creating job : "+jobName;
+                //  config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
                 //config.repl
                 uniqueJobs.add(jobName.toUpperCase());
 
 
-              //  config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
+                //  config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
                 //config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
-               // println config;
+                // println config;
                 config= jenkinsApi.getJobConfig(templateJobPrefix);
                 config=config.replace("GIT_URL",gitUrl);
                 config=config.replace("GIT_URL",gitUrl);
@@ -247,7 +240,7 @@ return uniqueJobs;
                 println "creating job =>"+ jobName;
                 jenkinsApi.post(jenkinsApi.buildJobPath("createItem", rootFolder, getOrg(), getRepo()), config, [name: jobName, mode: 'copy', from: templateJobPrefix], ContentType.XML)
                 jenkinsApi.post('job/' + jobName + "/config.xml", config, [:], ContentType.XML)
-               // break;
+                // break;
             }
 
 
@@ -258,22 +251,22 @@ return uniqueJobs;
 
 
         // for each branch name create a job
-       // from copy job
+        // from copy job
 
 
         // 2) create job for each branch
 
 
-       // restartJenkins();
-       // createRepo("nestedtype_git","nested_org3","testrepo1");
+        // restartJenkins();
+        // createRepo("nestedtype_git","nested_org3","testrepo1");
 
-       // System.out.println(jenkinsApi.getJobConfig("VivekTestSyncYOURPROJECTGitBranchesWithJenkins"));
+        // System.out.println(jenkinsApi.getJobConfig("VivekTestSyncYOURPROJECTGitBranchesWithJenkins"));
         //jenkinsApi.cre
-       // jenkinsApi.startJob("VivekTestSyncYOURPROJECTGitBranchesWithJenkins");
-       // BranchView branchView = new BranchView("","GraphiteDasboards/tree/master");
-       //jenkinsApi.createViewForBranch(branchView,"");
-       // jenkinsApi.createViewForBranch("branchView");
-       // jenkinsApi.createView("org3");
+        // jenkinsApi.startJob("VivekTestSyncYOURPROJECTGitBranchesWithJenkins");
+        // BranchView branchView = new BranchView("","GraphiteDasboards/tree/master");
+        //jenkinsApi.createViewForBranch(branchView,"");
+        // jenkinsApi.createViewForBranch("branchView");
+        // jenkinsApi.createView("org3");
         //println(jenkinsApi.getViewNames("test"));
 
         //WebClient wc = new WebClient();
@@ -309,10 +302,10 @@ return uniqueJobs;
         println 'expectedJobs';
         println expectedJobs;
 
-       /* createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
-        if (!noDelete) {
-            deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
-        }*/
+        /* createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
+         if (!noDelete) {
+             deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
+         }*/
     }
 
     public void createMissingJobs(List<ConcreteJob> expectedJobs, List<String> currentJobs, List<TemplateJob> templateJobs) {
@@ -377,18 +370,18 @@ return uniqueJobs;
         List<TemplateJob> templateJobs = allJobNames.findResults { String jobName ->
             TemplateJob templateJob = null
             jobName.find(regex)
-            { full, baseJobName, branchName ->
-                templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: branchName)
-            }
+                    { full, baseJobName, branchName ->
+                        templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: branchName)
+                    }
             return templateJob
         }
 
-      /*
-        for(int i=0;i<allJobNames.size();i++) {
-            if(allJobNames.get(i).contains(templateJobName)) templateJobs.add(allJobNames.get(i));
+        /*
+          for(int i=0;i<allJobNames.size();i++) {
+              if(allJobNames.get(i).contains(templateJobName)) templateJobs.add(allJobNames.get(i));
 
 
-        }*/
+          }*/
         assert templateJobs?.size() > 0, "Unable to find any jobs matching template regex: $regex\nYou need at least one job to match the templateJobPrefix and templateBranchName suffix arguments"
         return templateJobs
     }
@@ -415,7 +408,7 @@ return uniqueJobs;
     }
 
     public List<String> getDeprecatedViewNames(List<String> existingViewNames, List<BranchView> expectedBranchViews) {
-         return existingViewNames?.findAll { it.startsWith(this.templateJobPrefix) } - expectedBranchViews?.viewName ?: []
+        return existingViewNames?.findAll { it.startsWith(this.templateJobPrefix) } - expectedBranchViews?.viewName ?: []
     }
 
     public void deleteDeprecatedViews(List<String> deprecatedViewNames) {
