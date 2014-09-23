@@ -46,7 +46,7 @@ class JenkinsJobManager {
     }
     boolean checkRepoPresent() {
 
-        String url=jenkinsUrl+"view/Git-Structure/view/"+getOrg()+"/view/"+getRepo();
+        /*String url=jenkinsUrl+"view/Git-Structure/view/"+getOrg()+"/view/"+getRepo();
         System.out.println("checking path => "+ "view/Git-Structure/view/"+getOrg()+"/view/"+getRepo());
 
         try {
@@ -54,6 +54,7 @@ class JenkinsJobManager {
             String testurl=jenkinsUrl+"view/Git-Structure/view/"+getOrg()+"/view/"+getRepo()+"/newJob";
             URL u = new URL(testurl);
             HttpURLConnection huc = (HttpURLConnection) u.openConnection();
+
             huc.setRequestMethod("HEAD");
             if (huc.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 System.out.println("response code  => " + huc.getResponseCode() + " not found " + url);
@@ -67,10 +68,16 @@ class JenkinsJobManager {
             return false;
 
         }
+*/
+
+        String path = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
+        def response = get(path: path)
+        if (response.status >= 400) return false
+
+        return true;
 
 
     }
-
 
     public void restartJenkins()
     {
