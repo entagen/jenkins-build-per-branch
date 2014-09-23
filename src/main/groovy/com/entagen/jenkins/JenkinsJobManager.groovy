@@ -70,9 +70,9 @@ class JenkinsJobManager {
         }
 */
 
-       String path = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
+       String path1 = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
 //   String path = 'view/Git-Structure/view/' + getOrg() + '/view/' + getRepo();
-        def response = jenkinsApi.get(path1: path)
+        def response = jenkinsApi.get(path: path1)
         if (response.status >= 400) return false
 
         return true;
