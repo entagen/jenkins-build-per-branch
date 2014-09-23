@@ -9,6 +9,7 @@ class JenkinsJobManager {
     String nestedView
     String jenkinsUrl
     String branchNameRegex
+    String viewRegex
     String jenkinsUser
     String jenkinsPassword
     
@@ -124,7 +125,7 @@ class JenkinsJobManager {
     public void addMissingViews(List<BranchView> missingViews) {
         println "Missing views: $missingViews"
         for (BranchView missingView in missingViews) {
-            jenkinsApi.createViewForBranch(missingView, this.nestedView)
+            jenkinsApi.createViewForBranch(missingView, this.nestedView, this.viewRegex)
         }
     }
 
