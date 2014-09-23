@@ -11,10 +11,10 @@ import net.sf.json.JSONObject
 class JenkinsApiTests extends GroovyTestCase {
 
     @Test public void testInvalidHostThrowsConnectionException() {
-        JenkinsApi api = new JenkinsApi(jenkinsServerUrl: "http://invalid.foo:9090/jenkins")
+        JenkinsApi api = new JenkinsApi(jenkinsServerUrl: "http://some-invalid-hostname:9090/jenkins")
         assert shouldFail(UnknownHostException) {
             api.getJobNames("myproj")
-        }.contains("invalid.foo")
+        }.contains("some-invalid-hostname")
     }
 
     @Test public void testCantConnectToEndpointThrowsException() {
