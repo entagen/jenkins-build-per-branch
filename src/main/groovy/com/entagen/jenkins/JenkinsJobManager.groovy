@@ -70,7 +70,8 @@ class JenkinsJobManager {
         }
 */
 
-        String path = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
+//        String path = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
+   String path = 'view/Git-Structure/view/' + getOrg() + '/view/' + getRepo();
         def response = get(path: path)
         if (response.status >= 400) return false
 
