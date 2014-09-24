@@ -73,9 +73,15 @@ class JenkinsJobManager {
        String path1 = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
 //   String path = 'view/Git-Structure/view/' + getOrg() + '/view/' + getRepo();
         def response = jenkinsApi.get(path: path1)
-        if (response.status >= 400) return false
+        if (response.status != 200) {
+           System.out.println("repo not  present");
+            return false;
+        }
+        else {
+         System.out.println("repo already present");
 
         return true;
+        }
 
 
     }
