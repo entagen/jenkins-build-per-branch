@@ -73,7 +73,7 @@ class JenkinsJobManager {
        String path1 = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
 //   String path = 'view/Git-Structure/view/' + getOrg() + '/view/' + getRepo();
         boolean response = jenkinsApi.getCheck(path: path1)
-        return reponse;
+        return response;
 
 
     }
