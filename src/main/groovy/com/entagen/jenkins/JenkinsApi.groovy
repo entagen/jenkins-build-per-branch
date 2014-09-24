@@ -193,6 +193,39 @@ void startJob(String jobName) {
         return pathSuffix
     }
 
+
+
+protected getCheck(Map map) {
+        // get is destructive to the map, if there's an error we want the values around still
+        Map mapCopy = map.clone() as Map
+        def response
+
+        assert mapCopy.path != null, "'path' is a required attribute for the GET method"
+
+        try {
+            response = restClient.get(map)
+           /// response.
+        } catch (HttpHostConnectException ex) {
+            println "Unable to connect to host: $jenkinsServerUrl"
+            return 400;
+           // throw ex
+        } catch (UnknownHostException ex) {
+            println "Unknown host: $jenkinsServerUrl"
+            return 400;
+            //throw ex
+            
+        } catch (HttpResponseException ex) {
+             println "Unable to connect to host: $jenkinsServerUrl"
+             return 400;
+           // throw ex
+           // def message = "Unexpected failure with path $jenkinsServerUrl${mapCopy.path}, HTTP Status Code: ${ex.response?.status}, full map: $mapCopy"
+            //throw new Exception(message, ex)
+        }
+
+       // assert response.status < 400
+        return response
+    }
+
     protected get(Map map) {
         // get is destructive to the map, if there's an error we want the values around still
         Map mapCopy = map.clone() as Map
