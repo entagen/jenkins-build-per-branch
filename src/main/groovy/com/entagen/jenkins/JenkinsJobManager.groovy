@@ -92,7 +92,9 @@ class JenkinsJobManager {
         // Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
         println "sorry guys I am reloading :(";
         jenkinsApi.post('reload/');
-        sleep(30000);
+        sleep(60000);
+        println "finally reloaded :)";
+        
         // Thread.sleep(5000);
 
 
