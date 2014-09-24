@@ -73,7 +73,7 @@ class JenkinsJobManager {
        String path1 = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
 //   String path = 'view/Git-Structure/view/' + getOrg() + '/view/' + getRepo();
         def response = jenkinsApi.getCheck(path: path1)
-        if (response.status != 200) {
+        if (response.status.toString().compareTo("200")!=0) {
            System.out.println("repo not  present");
             return false;
         }
