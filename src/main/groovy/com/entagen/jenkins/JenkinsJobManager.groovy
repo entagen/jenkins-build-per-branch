@@ -40,7 +40,7 @@ class JenkinsJobManager {
         String git=gitUrl.substring(12);
         int first = git.indexOf('/');
         int second=git.indexOf('/',first+1);
-        println "org"+repo;
+        println "repo"+repo;
         return git.substring(second+1,git.length());
 
     }
