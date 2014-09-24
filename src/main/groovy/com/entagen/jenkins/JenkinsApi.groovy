@@ -195,7 +195,7 @@ void startJob(String jobName) {
 
 
 
-protected getCheck(Map map) {
+protected boolean getCheck(Map map) {
         // get is destructive to the map, if there's an error we want the values around still
         Map mapCopy = map.clone() as Map
         def response
@@ -204,26 +204,18 @@ protected getCheck(Map map) {
 
         try {
             response = restClient.get(map)
-           /// response.
-        } catch (HttpHostConnectException ex) {
-            println "Unable to connect to host: $jenkinsServerUrl"
-            return 400;
-           // throw ex
-        } catch (UnknownHostException ex) {
-            println "Unknown host: $jenkinsServerUrl"
-            return 400;
-            //throw ex
+            if(response.status==200) return true;
+            else return false;
             
-        } catch (HttpResponseException ex) {
-             println "Unable to connect to host: $jenkinsServerUrl"
-             return 400;
+           /// response.
+        } catch (Exception ex) {
+            println "Unable to connect to host: $jenkinsServerUrl"
+            return false;
            // throw ex
-           // def message = "Unexpected failure with path $jenkinsServerUrl${mapCopy.path}, HTTP Status Code: ${ex.response?.status}, full map: $mapCopy"
-            //throw new Exception(message, ex)
-        }
+        } 
 
        // assert response.status < 400
-        return response
+        return false;
     }
 
     protected get(Map map) {
