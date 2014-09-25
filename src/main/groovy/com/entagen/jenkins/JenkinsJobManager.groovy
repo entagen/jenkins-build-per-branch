@@ -236,6 +236,9 @@ class JenkinsJobManager {
                 //  config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
                 //config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
                 // println config;
+                emailId=emailId.replace(',',' ');
+                mavenCmd=mavenCmd.replace(',',' ');
+
                 config = jenkinsApi.getJobConfig(templateJobPrefix);
                 config = config.replace("GIT_URL", gitUrl);
                 config = config.replace("GIT_URL", gitUrl);
