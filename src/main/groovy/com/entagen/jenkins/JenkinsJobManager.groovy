@@ -249,7 +249,7 @@ class JenkinsJobManager {
                 config = config.replace("Maven_CMD_value", mavenCmd);
                 config = config.replace("UserProfile_value", userProfile);
                 config = config.replace("Maven_CMD_value", mavenCmd);
-                config.replace("EmailIds_value", emailId);
+                config=config.replace("EmailIds_value", emailId);
                 config.replace("EmailIds_value", emailId);
 
                 config = config.replace("BranchName", branchName);
