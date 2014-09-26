@@ -12,12 +12,9 @@ class Main {
             w: [longOpt: 'mavenCmd', required: false, args: 0, argName: 'mavenCmd', description: "mavenCmd"],
             l: [longOpt: 'userProfile', required: false, args: 0, argName: 'userProfile', description: "userProfile"],
             b: [longOpt: 'emailId', required: false, args: 0, argName: 'emailId', description: "emailId"],
-            e: [longOpt: 'business_Vertical', required: false, args: 0, argName: 'business_Vertical', description: "business_Vertical"],
+            y: [longOpt: 'business_Vertical', required: false, args: 0, argName: 'business_Vertical', description: "business_Vertical"],
             te: [longOpt: 'team', required: false, args: 0, argName: 'team', description: "team"],
-
-
             z: [longOpt: 'test', required: false, args: 1, argName: 'test', description: "test paramter"],
-
             a: [longOpt: 'jobPrefix', required: false, args: 1, argName: 'jobPrefix', description: "jobPrefix paramter"],
             j: [longOpt: 'jenkins-url', required: true, args: 1, argName: 'jenkinsUrl', description: "Jenkins URL - gradle flag -DjenkinsUrl=<jenkinsUrl>"],
             u: [longOpt: 'git-url',  required: true, args: 1, argName: 'gitUrl', description: "Git Repository URL - gradle flag -DgitUrl=<gitUrl>"],
