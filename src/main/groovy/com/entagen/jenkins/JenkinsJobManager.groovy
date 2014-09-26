@@ -32,79 +32,6 @@ class JenkinsJobManager {
     String org;
     String rootFolder = "Git-Structure";
 
-    String getOrg() {
-        String git = gitUrl.substring(12);
-
-        int first = git.indexOf('/');
-        int second = git.indexOf('/', first + 1);
-        println "org" + org;
-
-        return git.substring(first + 1, second);
-
-
-    }
-
-    String getRepo() {
-        println "gitul" + gitUrl;
-        String git = gitUrl.substring(12);
-        int first = git.indexOf('/');
-        int second = git.indexOf('/', first + 1);
-        println "repo" + repo;
-        return git.substring(second + 1, git.length());
-
-    }
-
-    boolean createJobsForallRepo() {
-
-        /*String url=jenkinsUrl+"view/Git-Structure/view/"+getOrg()+"/view/"+getRepo();
-        System.out.println("checking path => "+ "view/Git-Structure/view/"+getOrg()+"/view/"+getRepo());
-
-        try {
-
-            String testurl=jenkinsUrl+"view/Git-Structure/view/"+getOrg()+"/view/"+getRepo()+"/newJob";
-            URL u = new URL(testurl);
-            HttpURLConnection huc = (HttpURLConnection) u.openConnection();
-
-            huc.setRequestMethod("HEAD");
-            if (huc.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                System.out.println("response code  => " + huc.getResponseCode() + " not found " + url);
-                return false;
-            } else {
-                System.out.println("response code => " + huc.getResponseCode() + " " + url);
-                return true;
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-            return false;
-
-        }
-*/
-
-        String path1 = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
-//   String path = 'view/Git-Structure/view/' + getOrg() + '/view/' + getRepo();
-        boolean response = jenkinsApi.getCheck(path: path1)
-        return response;
-
-
-    }
-
-    public void restartJenkins() {
-        Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
-        //  Thread.sleep(5000);
-
-    }
-
-    public void reload() {
-        // Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
-        println "sorry guys I am reloading :(";
-        jenkinsApi.post('reload/');
-        sleep(60000);
-        println "finally reloaded :)";
-
-        // Thread.sleep(5000);
-
-
-    }
 
 
     JenkinsJobManager(Map props) {
@@ -529,6 +456,79 @@ class JenkinsJobManager {
         }
 
         // then add the line f
+
+    }
+    String getOrg() {
+        String git = gitUrl.substring(12);
+
+        int first = git.indexOf('/');
+        int second = git.indexOf('/', first + 1);
+        println "org" + org;
+
+        return git.substring(first + 1, second);
+
+
+    }
+
+    String getRepo() {
+        println "gitul" + gitUrl;
+        String git = gitUrl.substring(12);
+        int first = git.indexOf('/');
+        int second = git.indexOf('/', first + 1);
+        println "repo" + repo;
+        return git.substring(second + 1, git.length());
+
+    }
+
+    boolean createJobsForallRepo() {
+
+        /*String url=jenkinsUrl+"view/Git-Structure/view/"+getOrg()+"/view/"+getRepo();
+        System.out.println("checking path => "+ "view/Git-Structure/view/"+getOrg()+"/view/"+getRepo());
+
+        try {
+
+            String testurl=jenkinsUrl+"view/Git-Structure/view/"+getOrg()+"/view/"+getRepo()+"/newJob";
+            URL u = new URL(testurl);
+            HttpURLConnection huc = (HttpURLConnection) u.openConnection();
+
+            huc.setRequestMethod("HEAD");
+            if (huc.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                System.out.println("response code  => " + huc.getResponseCode() + " not found " + url);
+                return false;
+            } else {
+                System.out.println("response code => " + huc.getResponseCode() + " " + url);
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+
+        }
+*/
+
+        String path1 = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
+//   String path = 'view/Git-Structure/view/' + getOrg() + '/view/' + getRepo();
+        boolean response = jenkinsApi.getCheck(path: path1)
+        return response;
+
+
+    }
+
+    public void restartJenkins() {
+        Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
+        //  Thread.sleep(5000);
+
+    }
+
+    public void reload() {
+        // Process p = Runtime.getRuntime().exec("sudo /etc/init.d/jenkins restart");
+        println "sorry guys I am reloading :(";
+        jenkinsApi.post('reload/');
+        sleep(60000);
+        println "finally reloaded :)";
+
+        // Thread.sleep(5000);
+
 
     }
 
