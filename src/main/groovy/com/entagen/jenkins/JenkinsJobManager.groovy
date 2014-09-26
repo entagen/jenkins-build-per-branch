@@ -247,7 +247,7 @@ class JenkinsJobManager {
                 config = config.replace("GIT_URL", gitUrl);
                 config = config.replace("GIT_URL", gitUrl);
                 config = config.replace("GIT_URL", gitUrl);
-                if(userProfile!=null)
+               // if(userProfile!=null)
                 config = config.replace("UserProfile_value", userProfile);
                 config = config.replace("Maven_CMD_value", mavenCmd);
                 config = config.replace("UserProfile_value", userProfile);
