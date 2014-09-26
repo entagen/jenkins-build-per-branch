@@ -54,7 +54,7 @@ class JenkinsJobManager {
 
     }
 
-    boolean checkRepoPresent() {
+    boolean createJobsForallRepo() {
 
         /*String url=jenkinsUrl+"view/Git-Structure/view/"+getOrg()+"/view/"+getRepo();
         System.out.println("checking path => "+ "view/Git-Structure/view/"+getOrg()+"/view/"+getRepo());
@@ -128,13 +128,13 @@ class JenkinsJobManager {
         println "org+repo" + org + repo;
         //createOrg( rootFolder,  getOrg());
 
-        testFunction();
+        createJobsForallRepo();
 
 
     }
 
 
-    public void createOrg(String rootFolder) {
+    public void createNestedViewOrg(String rootFolder) {
         println "org is" + org;
         //reload();
         // need to create a nestedType view in org
@@ -171,7 +171,7 @@ class JenkinsJobManager {
 
     }
 
-    public void createRepo(String rootFolder, String org, String repoName) {
+    public void createRepoView(String rootFolder, String org, String repoName) {
         // need to create listView in org
         // this can be done with existing functions
         // createOrg(rootFolder,org);
@@ -197,7 +197,7 @@ class JenkinsJobManager {
         return uniqueJobs;
     }
 
-    public void testFunction() {
+    public void createJobsForallBranches() {
 
 
         List<String> jobList = jenkinsApi.getJobNames("");
@@ -206,63 +206,44 @@ class JenkinsJobManager {
         System.out.println("emailid" + emailId + "businessVertical=>" + businessVertical + "team=>" + team);
         HashSet<String> uniqueJobs = createJobSet(jobList);
         // for(int i=0;i<jo)
-        createOrg(rootFolder);
+        createNestedViewOrg(rootFolder);
         if (!checkRepoPresent()) {
             println "creating repo";
 
-            createRepo("Git-Structure", getOrg(), getRepo());
+            createRepoView("Git-Structure", getOrg(), getRepo());
         }
-        // 1) get the list of branches
+
         List<String> branchNameList = gitApi.getBranchNames();
         //  println jenkinsApi.getJobConfig("sandbox-cyclops-Dev_job-develop");
         String config = jenkinsApi.getJobConfig(templateJobPrefix);
-        // post(jenkinsApi.buildJobPath("createItem", rootFolder,getOrg(),getRepo()), config, [name: "testJob", mode: 'copy', from: "sandbox-cyclops-Dev_job-develop"], ContentType.XML)
-        //'createItem'
+
         String jobName;
 
 
         for (int i = 0; i < branchNameList.size(); i++) {
             String branchName = branchNameList.get(i);
-            //  branchName.replaceAll('/', '_')
-            //jobName=jobPrefix+ branchName.replaceAll('/', '_');
+
             jobName = getOrg() + "_" + getRepo() + "_" + branchName.replaceAll('/', '_');
 
-            // config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
-            // println config;
+
             if (!jobList.contains(jobName) && !uniqueJobs.contains(jobName.toUpperCase())) {
-                // println "creating job : "+jobName;
-                //  config=config.replace('>'+templateBranchName+'<','>'+branchName+'<');
-                //config.repl
+
                 uniqueJobs.add(jobName.toUpperCase());
 
-                //  config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
-                //config=config.replace(">"+templateBranchName+"<",">"+branchName+"<");
-                // println config;
+
                 emailId = emailId.replace(',', ' ');
                 mavenCmd = mavenCmd.replace(',', ' ');
 
                 config = jenkinsApi.getJobConfig(templateJobPrefix);
                 config = config.replace("GIT_URL", gitUrl);
-                config = config.replace("GIT_URL", gitUrl);
-                config = config.replace("GIT_URL", gitUrl);
-                config = config.replace("GIT_URL", gitUrl);
-                config = config.replace("GIT_URL", gitUrl);
-                if(userProfile!=null)
                 config = config.replace("UserProfile_value", userProfile);
                 config = config.replace("Maven_CMD_value", mavenCmd);
-                if(userProfile!=null)
-                config = config.replace("UserProfile_value", userProfile);
                 config = config.replace("Maven_CMD_value", mavenCmd);
                 config = config.replace("EmailIds_value", emailId);
                 config = config.replace("Team_value", team);
                 config = config.replace("Business_Vertical_value", businessVertical);
                 config = config.replace("Team_value", team);
                 config = config.replace("Business_Vertical_value", businessVertical);
-
-
-                config = config.replace("BranchName", branchName);
-                config = config.replace("BranchName", branchName);
-                config = config.replace("BranchName", branchName);
                 config = config.replace("BranchName", branchName);
                 println "creating job =>" + jobName;
                 jenkinsApi.post(jenkinsApi.buildJobPath("createItem", rootFolder, getOrg(), getRepo()), config, [name: jobName, mode: 'copy', from: templateJobPrefix], ContentType.XML)
@@ -273,26 +254,6 @@ class JenkinsJobManager {
 
         }
 
-        //jenkinsApi.post('job/' + jobname + "/config.xml", config, [:], ContentType.XML)
-
-        // for each branch name create a job
-        // from copy job
-
-        // 2) create job for each branch
-
-        // restartJenkins();
-        // createRepo("nestedtype_git","nested_org3","testrepo1");
-
-        // System.out.println(jenkinsApi.getJobConfig("VivekTestSyncYOURPROJECTGitBranchesWithJenkins"));
-        //jenkinsApi.cre
-        // jenkinsApi.startJob("VivekTestSyncYOURPROJECTGitBranchesWithJenkins");
-        // BranchView branchView = new BranchView("","GraphiteDasboards/tree/master");
-        //jenkinsApi.createViewForBranch(branchView,"");
-        // jenkinsApi.createViewForBranch("branchView");
-        // jenkinsApi.createView("org3");
-        //println(jenkinsApi.getViewNames("test"));
-
-        //WebClient wc = new WebClient();
 
     }
 
