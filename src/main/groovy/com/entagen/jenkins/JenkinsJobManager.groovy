@@ -18,6 +18,8 @@ class JenkinsJobManager {
     String userProfile;
     String mavenCmd;
     String emailId;
+    String business_Vertical;
+    String team;
 
     Boolean dryRun = false
     Boolean noViews = false
@@ -250,7 +252,11 @@ class JenkinsJobManager {
                 config = config.replace("UserProfile_value", userProfile);
                 config = config.replace("Maven_CMD_value", mavenCmd);
                 config=config.replace("EmailIds_value", emailId);
-                config.replace("EmailIds_value", emailId);
+                config=config.replace("Team_value", team);
+                config=config.replace("Business_Vertical_value",business_Vertical);
+                config=config.replace("Team_value", team);
+                config=config.replace("Business_Vertical_value",business_Vertical);
+
 
                 config = config.replace("BranchName", branchName);
                 config = config.replace("BranchName", branchName);
