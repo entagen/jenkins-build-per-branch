@@ -32,12 +32,8 @@ class JenkinsJobManager {
     String org;
     String rootFolder = "Git-Structure";
 
+void getJenkinsPassword() {
 
-
-    JenkinsJobManager(Map props) {
-        for (property in props) {
-            this."${property.key}" = property.value
-        }
         try {
 
             BufferedReader bufferedReaderpassword = new BufferedReader(new FileReader(
@@ -46,15 +42,22 @@ class JenkinsJobManager {
 
 
         } catch (Exception e) {
+            System.out.println(e);
 
         }
+
+    }
+
+    JenkinsJobManager(Map props) {
+        for (property in props) {
+            this."${property.key}" = property.value
+        }
+        getJenkinsPassword();
         initJenkinsApi()
         initGitApi()
         org = getOrg();
         repo = getRepo();
         println "org+repo" + org + repo;
-        //createOrg( rootFolder,  getOrg());
-
         createJobsForallRepo();
 
 
@@ -63,11 +66,7 @@ class JenkinsJobManager {
 
     public void createNestedViewOrg(String rootFolder) {
         println "org is" + org;
-        //reload();
-        // need to create a nestedType view in org
-        // first find the org
-        // then <views>
-        // then add the code
+
         String filename = "/tmp/config.xml";
         filename = "/d0/jenkins/config.xml";
         String fileRead = readFile(filename);
@@ -87,14 +86,9 @@ class JenkinsJobManager {
             println "creating org =>" + org;
             config(filename, rootFolder, "<views>", toInsert);
             reload();
-            // reload();
 
-            //restartJenkins();
 
         }
-
-        //for this we need to write the file handing program
-
 
     }
 
