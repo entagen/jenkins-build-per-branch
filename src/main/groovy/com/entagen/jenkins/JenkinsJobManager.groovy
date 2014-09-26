@@ -18,7 +18,7 @@ class JenkinsJobManager {
     String userProfile;
     String mavenCmd;
     String emailId;
-    String business_Vertical;
+    String businessVertical;
     String team;
 
     Boolean dryRun = false
@@ -203,7 +203,7 @@ class JenkinsJobManager {
         List<String> jobList = jenkinsApi.getJobNames("");
         System.out.println("userprofile:" + userProfile);
         System.out.println("mavenCmd" + mavenCmd);
-        System.out.println("emailid" + emailId + "business_Vertical=>" + business_Vertical + "team=>" + team);
+        System.out.println("emailid" + emailId + "businessVertical=>" + businessVertical + "team=>" + team);
         HashSet<String> uniqueJobs = createJobSet(jobList);
         // for(int i=0;i<jo)
         createOrg(rootFolder);
@@ -253,9 +253,9 @@ class JenkinsJobManager {
                 config = config.replace("Maven_CMD_value", mavenCmd);
                 config = config.replace("EmailIds_value", emailId);
                 config = config.replace("Team_value", team);
-                config = config.replace("Business_Vertical_value", business_Vertical);
+                config = config.replace("Business_Vertical_value", businessVertical);
                 config = config.replace("Team_value", team);
-                config = config.replace("Business_Vertical_value", business_Vertical);
+                config = config.replace("Business_Vertical_value", businessVertical);
 
 
                 config = config.replace("BranchName", branchName);
