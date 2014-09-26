@@ -12,7 +12,7 @@ class Main {
             w: [longOpt: 'mavenCmd', required: false, args: 0, argName: 'mavenCmd', description: "mavenCmd"],
             l: [longOpt: 'userProfile', required: false, args: 0, argName: 'userProfile', description: "userProfile"],
             b: [longOpt: 'emailId', required: false, args: 0, argName: 'emailId', description: "emailId"],
-            bu: [longOpt: 'business_Vertical', required: false, args: 0, argName: 'business_Vertical', description: "business_Vertical"],
+            e: [longOpt: 'business_Vertical', required: false, args: 0, argName: 'business_Vertical', description: "business_Vertical"],
             te: [longOpt: 'team', required: false, args: 0, argName: 'team', description: "team"],
 
 
