@@ -58,8 +58,8 @@ void getJenkinsPassword() {
         org = getOrg();
         repo = getRepo();
         println "org+repo" + org + repo;
-        createJobsForallRepo();
-
+       // createJobsForallRepo();
+        createJobsForallBranches();
 
     }
 
