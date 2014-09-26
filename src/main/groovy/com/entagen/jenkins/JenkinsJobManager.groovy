@@ -32,7 +32,7 @@ class JenkinsJobManager {
     String org;
     String rootFolder = "Git-Structure";
 
-void getJenkinsPassword() {
+    void getJenkinsPassword() {
 
         try {
 
@@ -58,7 +58,7 @@ void getJenkinsPassword() {
         org = getOrg();
         repo = getRepo();
         println "org+repo" + org + repo;
-       // createJobsForallRepo();
+        // createJobsForallRepo();
         createJobsForallBranches();
 
     }
@@ -452,6 +452,7 @@ void getJenkinsPassword() {
         // then add the line f
 
     }
+
     String getOrg() {
         String git = gitUrl.substring(12);
 
@@ -526,5 +527,15 @@ void getJenkinsPassword() {
 
     }
 
+    boolean checkRepoPresent() {
+
+
+        String path1 = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
+//   String path = 'view/Git-Structure/view/' + getOrg() + '/view/' + getRepo();
+        boolean response = jenkinsApi.getCheck(path: path1)
+        return response;
+
+
+    }
 
 }
