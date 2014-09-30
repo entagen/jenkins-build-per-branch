@@ -67,7 +67,7 @@ class JenkinsJobManager {
 
 
     public void callForallTheRepos(String filePath) {
-        try {
+
             try {
 
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(
@@ -84,15 +84,14 @@ class JenkinsJobManager {
                     org=parameters[2];
                     team=parameters[3];
                     userProfile=parameters[4];
+                    System.out.println(gitUrl+emailId+org+team+userProfile);
                     createJobsForallBranches(jobList);
 
 
 
                 }
 
-            } catch (Exception e) {
 
-            }
 
         }catch (Exception e) {
             System.out.println(e);
