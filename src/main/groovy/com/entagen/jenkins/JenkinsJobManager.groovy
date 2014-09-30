@@ -103,9 +103,9 @@ class JenkinsJobManager {
 
                     team=parameters[3];
                     userProfile=parameters[4];
-                    if(org.length()==0) org="";
-                    if(team.length()==0) team="";
-                    if(userProfile.length()==0) userProfile="";
+                    if(org==null||org.length()==0) org="null";
+                    if(team==null|| team.length()==0) team="null";
+                    if(userProfile==null || userProfile.length()==0) userProfile="null";
                     System.out.println(gitUrl+emailId+org+team+userProfile);
                     createJobsForallBranches(jobList);
 
