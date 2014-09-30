@@ -116,6 +116,7 @@ class JenkinsJobManager {
                 if(gitUrl.charAt(gitUrl.length()-1)=='/') {
                     gitUrl = gitUrl.substring(0, gitUrl.length() - 1);
                 }
+                gitUrl = gitUrl.replace(".git", "");
 
                 gitApi.gitUrl = gitUrl;
                 emailId = param[0];
