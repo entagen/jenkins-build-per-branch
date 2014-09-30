@@ -100,6 +100,7 @@ class JenkinsJobManager {
                    // call the
                     String[] param=line.split(";");
                     gitUrl=param[4];
+                    
                     gitApi.gitUrl=gitUrl;
                     emailId=param[0];
 
@@ -110,7 +111,10 @@ class JenkinsJobManager {
                     if(businessVertical==null||businessVertical.length()==0) businessVertical="null";
                     if(team==null|| team.length()==0) team="null";
                     if(userProfile==null || userProfile.length()==0) userProfile="null";
-                    System.out.println("actual data" +gitUrl+";"+emailId+":"+businessVertical+team+userProfile);
+                    System.out.println("actual data :"+gitUrl+";"+emailId+":"+businessVertical+team+userProfile);
+                    org = getOrg();
+                    repo = getRepo();
+
                     createJobsForallBranches(jobList);
 
 
