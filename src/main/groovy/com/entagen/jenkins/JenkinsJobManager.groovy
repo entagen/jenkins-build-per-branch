@@ -101,9 +101,14 @@ class JenkinsJobManager {
                 // call the
                 String[] param = line.split(";");
                 gitUrl = param[4];
+                //format giturl
+                if(gitUrl.contains("git@")) {
+
+
                 gitUrl = gitUrl.replace(':', '/');
                 gitUrl = gitUrl.replace("git@", "https://");
                 gitUrl = gitUrl.replace(".git", "");
+                }
 
                 gitApi.gitUrl = gitUrl;
                 emailId = param[0];
