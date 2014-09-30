@@ -108,6 +108,7 @@ class JenkinsJobManager {
                 gitUrl = gitUrl.replace(':', '/');
                 gitUrl = gitUrl.replace("git@", "https://");
                 gitUrl = gitUrl.replace(".git", "");
+                gitUrl=gitUrl.substring(0,gitUrl.length()-1);
                 }
 
                 gitApi.gitUrl = gitUrl;
