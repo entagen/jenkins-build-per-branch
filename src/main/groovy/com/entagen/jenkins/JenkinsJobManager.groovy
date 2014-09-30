@@ -96,16 +96,17 @@ class JenkinsJobManager {
                 List<String> jobList = jenkinsApi.getJobNames("");
 
                 while ((line = bufferedReader.readLine()) != null) {
+                    System.out.println(line+" line");
                    // call the
-                    String[] parameters=line.split(";");
-                    gitUrl=paramaters[0];
+                    String[] param=line.split(";");
+                    gitUrl=param[0];
                     gitApi.gitUrl=gitUrl;
-                    emailId=parameters[1];
+                    emailId=param[1];
 
-                    org=parameters[2];
+                    org=param[2];
 
-                    team=parameters[3];
-                    userProfile=parameters[4];
+                    team=param[3];
+                    userProfile=param[4];
                     if(org==null||org.length()==0) org="null";
                     if(team==null|| team.length()==0) team="null";
                     if(userProfile==null || userProfile.length()==0) userProfile="null";
