@@ -41,8 +41,8 @@ class JenkinsJobManager {
             BufferedWriter bufferedWriter= new BufferedWriter(new FileWriter(
                     "/tmp/reposList"));
 
-            bufferedWriter.write("https://github.corp.inmobi.com/inmobi-commons/phoenix-core-api.git;;Ad serving, relevance and marketplace;common adserve;;\n");
-           // bufferedWriter.write("whirr-inmobi_Dev_master;samarth.gupta@inmobi.com;;;;\n");
+            bufferedWriter.write("pruthvi.gr@inmobi.com;;;;https://github.corp.inmobi.com/mpower/mpower-cannedreportservice;\n");
+           bufferedWriter.write("pruthvi.gr@inmobi.com;Bizapps;Cosmos;;https://github.corp.inmobi.com/bizapps/cosmos-rtbdops;\n");
             bufferedWriter.close();
 
         } catch (Exception e) {
@@ -99,14 +99,14 @@ class JenkinsJobManager {
                     System.out.println(line+" line");
                    // call the
                     String[] param=line.split(";");
-                    gitUrl=param[0];
+                    gitUrl=param[4];
                     gitApi.gitUrl=gitUrl;
-                    emailId=param[1];
+                    emailId=param[0];
 
-                    businessVertical=param[2];
+                    businessVertical=param[1];
 
-                    team=param[3];
-                    userProfile=param[4];
+                    team=param[2];
+                    userProfile=param[3];
                     if(businessVertical==null||businessVertical.length()==0) businessVertical="null";
                     if(team==null|| team.length()==0) team="null";
                     if(userProfile==null || userProfile.length()==0) userProfile="null";
