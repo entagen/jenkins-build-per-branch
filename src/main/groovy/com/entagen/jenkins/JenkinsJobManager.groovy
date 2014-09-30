@@ -42,7 +42,7 @@ class JenkinsJobManager {
                     "/tmp/reposList"));
 
             bufferedWriter.write("https://github.corp.inmobi.com/ifc/IFC-Commons;ifc-dev@inmobi.com;Brand and Commerce;Commerce;;\n");
-           // bufferedWriter.write("whirr-inmobi_Dev_master;samarth.gupta@inmobi.com;;;;\n");
+           bufferedWriter.write("https://github.corp.inmobi.com/inmobi-commons/phoenix-core-api;;Ad serving, relevance and marketplace;common adserve;;\n");
             bufferedWriter.close();
 
         } catch (Exception e) {
