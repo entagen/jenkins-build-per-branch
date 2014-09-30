@@ -58,11 +58,46 @@ class JenkinsJobManager {
         org = getOrg();
         repo = getRepo();
         println "org+repo" + org + repo;
+
         // createJobsForallRepo();
-        createJobsForallBranches();
+        callForallTheRepos("/tmp/reposList");
+       // createJobsForallBranches();
 
     }
 
+
+    public void callForallTheRepos(String filePath) {
+        try {
+            try {
+
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(
+                        filePath));
+                String line = "";
+                List<String> jobList = jenkinsApi.getJobNames("");
+
+                while ((line = bufferedReader.readLine()) != null) {
+                   // call the
+                    String[] parameters=line.split(";");
+                    gitUrl=paramaters[0];
+                    gitApi.gitUrl=gitUrl;
+                    emailId=parameters[1];
+                    org=parameters[2];
+                    team=parameters[3];
+                    userProfile=parameters[4];
+                    createJobsForallBranches(jobList);
+
+
+
+                }
+
+            } catch (Exception e) {
+
+            }
+
+        }catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 
     public void createNestedViewOrg(String rootFolder) {
         println "org is" + org;
@@ -118,10 +153,12 @@ class JenkinsJobManager {
         return uniqueJobs;
     }
 
-    public void createJobsForallBranches() {
 
 
-        List<String> jobList = jenkinsApi.getJobNames("");
+    public void createJobsForallBranches( List<String> jobList) {
+
+
+      //  List<String> jobList = jenkinsApi.getJobNames("");
         System.out.println("userprofile:" + userProfile);
         System.out.println("mavenCmd" + mavenCmd);
         System.out.println("emailid" + emailId + "businessVertical=>" + businessVertical + "team=>" + team);
