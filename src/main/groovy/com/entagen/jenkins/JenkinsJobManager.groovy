@@ -41,8 +41,8 @@ class JenkinsJobManager {
             BufferedWriter bufferedWriter= new BufferedWriter(new FileWriter(
                     "/tmp/reposList"));
 
-            bufferedWriter.write("whirr-inmobi_Dev_master;samarth.gupta@inmobi.com;;;;\n");
-            bufferedWriter.write("whirr-inmobi_Dev_master;samarth.gupta@inmobi.com;;;;\n");
+            bufferedWriter.write("whirr-inmobi_Dev_master;samarth.gupta@inmobi.com;gfd;gdf;gdffg;fdgdfg;\n");
+           // bufferedWriter.write("whirr-inmobi_Dev_master;samarth.gupta@inmobi.com;;;;\n");
             bufferedWriter.close();
 
         } catch (Exception e) {
