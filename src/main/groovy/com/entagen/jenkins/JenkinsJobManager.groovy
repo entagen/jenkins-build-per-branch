@@ -31,6 +31,22 @@ class JenkinsJobManager {
     String repo;
     String org;
     String rootFolder = "Git-Structure";
+    void createFile() {
+
+        try {
+
+            BufferedWriter bufferedWriter= new BufferedWriter(new FileWriter(
+                    "/tmp/reposList"));
+
+            bufferedWriter.write("whirr-inmobi_Dev_master;samarth.gupta@inmobi.com;;;;\n");
+            bufferedWriter.write("whirr-inmobi_Dev_master;samarth.gupta@inmobi.com;;;;\n");
+            bufferedWriter.close();
+
+        } catch (Exception e) {
+            System.out.println(e);
+
+        }
+    }
 
     void getJenkinsPassword() {
 
@@ -60,6 +76,7 @@ class JenkinsJobManager {
         println "org+repo" + org + repo;
 
         // createJobsForallRepo();
+        createFile();
         callForallTheRepos("/tmp/reposList");
        // createJobsForallBranches();
 
@@ -81,9 +98,14 @@ class JenkinsJobManager {
                     gitUrl=paramaters[0];
                     gitApi.gitUrl=gitUrl;
                     emailId=parameters[1];
+
                     org=parameters[2];
+
                     team=parameters[3];
                     userProfile=parameters[4];
+                    if(org.length()==0) org="";
+                    if(team.length()==0) team="";
+                    if(userProfile.length()==0) userProfile="";
                     System.out.println(gitUrl+emailId+org+team+userProfile);
                     createJobsForallBranches(jobList);
 
