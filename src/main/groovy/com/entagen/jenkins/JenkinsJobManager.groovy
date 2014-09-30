@@ -100,7 +100,7 @@ class JenkinsJobManager {
                    // call the
                     String[] param=line.split(";");
                     gitUrl=param[4];
-                    
+
                     gitApi.gitUrl=gitUrl;
                     emailId=param[0];
 
@@ -598,6 +598,7 @@ class JenkinsJobManager {
 
 
         String path1 = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
+        System.out.println("checking repo"+path1);
 //   String path = 'view/Git-Structure/view/' + getOrg() + '/view/' + getRepo();
         boolean response = jenkinsApi.getCheck(path: path1)
         return response;
