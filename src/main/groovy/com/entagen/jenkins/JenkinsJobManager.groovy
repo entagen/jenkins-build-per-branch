@@ -34,15 +34,16 @@ class JenkinsJobManager {
     String repo;
     String org;
     String rootFolder = "Git-Structure";
+
     void createFile() {
 
         try {
 
-            BufferedWriter bufferedWriter= new BufferedWriter(new FileWriter(
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(
                     "/tmp/reposList"));
 
             bufferedWriter.write("pruthvi.gr@inmobi.com;;;;https://github.corp.inmobi.com/mpower/mpower-cannedreportservice;\n");
-           bufferedWriter.write("pruthvi.gr@inmobi.com;Bizapps;Cosmos;;https://github.corp.inmobi.com/bizapps/cosmos-rtbdops;\n");
+            bufferedWriter.write("pruthvi.gr@inmobi.com;Bizapps;Cosmos;;https://github.corp.inmobi.com/bizapps/cosmos-rtbdops;\n");
             bufferedWriter.close();
 
         } catch (Exception e) {
@@ -79,51 +80,52 @@ class JenkinsJobManager {
         println "org+repo" + org + repo;
 
         // createJobsForallRepo();
-    //    createFile();
+        //    createFile();
         callForallTheRepos("/tmp/reposList");
-       // createJobsForallBranches();
+        // createJobsForallBranches();
 
     }
 
 
     public void callForallTheRepos(String filePath) {
 
-            try {
+        try {
 
-                BufferedReader bufferedReader = new BufferedReader(new FileReader(
-                        filePath));
-                String line = "";
-                List<String> jobList = jenkinsApi.getJobNames("");
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(
+                    filePath));
+            String line = "";
+            List<String> jobList = jenkinsApi.getJobNames("");
 
-                while ((line = bufferedReader.readLine()) != null) {
-                    System.out.println(line+" line");
-                   // call the
-                    String[] param=line.split(";");
-                    gitUrl=param[4];
+            while ((line = bufferedReader.readLine()) != null) {
+                System.out.println(line + " line");
+                // call the
+                String[] param = line.split(";");
+                gitUrl = param[4];
+                gitUrl = gitUrl.replace(':', '/');
+                gitUrl = gitUrl.replace("git@", "https://");
+                gitUrl = gitUrl.replace(".git", "");
 
-                    gitApi.gitUrl=gitUrl;
-                    emailId=param[0];
+                gitApi.gitUrl = gitUrl;
+                emailId = param[0];
 
-                    businessVertical=param[1];
+                businessVertical = param[1];
 
-                    team=param[2];
-                    userProfile=param[3];
-                    if(businessVertical==null||businessVertical.length()==0) businessVertical="null";
-                    if(team==null|| team.length()==0) team="null";
-                    if(userProfile==null || userProfile.length()==0) userProfile="null";
-                    System.out.println("actual data :"+gitUrl+";"+emailId+":"+businessVertical+team+userProfile);
-                    org = getOrg();
-                    repo = getRepo();
+                team = param[2];
+                userProfile = param[3];
+                if (businessVertical == null || businessVertical.length() == 0) businessVertical = "null";
+                if (team == null || team.length() == 0) team = "null";
+                if (userProfile == null || userProfile.length() == 0) userProfile = "null";
+                System.out.println("actual data :" + gitUrl + ";" + emailId + ":" + businessVertical + team + userProfile);
+                org = getOrg();
+                repo = getRepo();
 
-                    createJobsForallBranches(jobList);
-
-
-
-                }
-
+                createJobsForallBranches(jobList);
 
 
-        }catch (Exception e) {
+            }
+
+
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
@@ -183,11 +185,9 @@ class JenkinsJobManager {
     }
 
 
+    public void createJobsForallBranches(List<String> jobList) {
 
-    public void createJobsForallBranches( List<String> jobList) {
-
-
-      //  List<String> jobList = jenkinsApi.getJobNames("");
+        //  List<String> jobList = jenkinsApi.getJobNames("");
 
         System.out.println("userprofile:" + userProfile);
         System.out.println("mavenCmd" + mavenCmd);
@@ -598,7 +598,7 @@ class JenkinsJobManager {
 
 
         String path1 = "view/Git-Structure/view/" + getOrg() + "/view/" + getRepo();
-        System.out.println("checking repo"+path1);
+        System.out.println("checking repo" + path1);
 //   String path = 'view/Git-Structure/view/' + getOrg() + '/view/' + getRepo();
         boolean response = jenkinsApi.getCheck(path: path1)
         return response;
