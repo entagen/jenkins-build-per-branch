@@ -41,8 +41,8 @@ class JenkinsJobManager {
             BufferedWriter bufferedWriter= new BufferedWriter(new FileWriter(
                     "/tmp/reposList"));
 
-            bufferedWriter.write("https://github.corp.inmobi.com/ifc/IFC-Commons;ifc-dev@inmobi.com;Brand and Commerce;Commerce;;\n");
-           bufferedWriter.write("https://github.corp.inmobi.com/inmobi-commons/phoenix-core-api;;Ad serving, relevance and marketplace;common adserve;;\n");
+            bufferedWriter.write("https://github.corp.inmobi.com/ifc/IFC-Commons;ifc-dev@inmobi.com;Brand and Commerce;Commerce;fsfd;dsfdf;sdfsdf;sdfdf;\n");
+           bufferedWriter.write("https://github.corp.inmobi.com/inmobi-commons/phoenix-core-api;sdfsdf;Ad serving, relevance and marketplace;common adserve;sdfsdf;dsfsdf;sdfsdf;\n");
             bufferedWriter.close();
 
         } catch (Exception e) {
