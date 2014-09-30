@@ -41,8 +41,8 @@ class JenkinsJobManager {
             BufferedWriter bufferedWriter= new BufferedWriter(new FileWriter(
                     "/tmp/reposList"));
 
-            bufferedWriter.write("https://github.corp.inmobi.com/ifc/IFC-Commons;ifc-dev@inmobi.com;Brand and Commerce;Commerce;fsfd;dsfdf;sdfsdf;sdfdf;\n");
-           bufferedWriter.write("https://github.corp.inmobi.com/inmobi-commons/phoenix-core-api;sdfsdf;Ad serving, relevance and marketplace;common adserve;sdfsdf;dsfsdf;sdfsdf;\n");
+            bufferedWriter.write("https://github.corp.inmobi.com/ifc/IFC-Commons;ifc-dev@inmobi.com;Brand and Commerce;Commerce;;\n");
+           // bufferedWriter.write("whirr-inmobi_Dev_master;samarth.gupta@inmobi.com;;;;\n");
             bufferedWriter.close();
 
         } catch (Exception e) {
@@ -103,14 +103,14 @@ class JenkinsJobManager {
                     gitApi.gitUrl=gitUrl;
                     emailId=param[1];
 
-                    org=param[2];
+                    businessVertical=param[2];
 
                     team=param[3];
                     userProfile=param[4];
-                    if(org==null||org.length()==0) org="null";
+                    if(businessVertical==null||businessVertical.length()==0) businessVertical="null";
                     if(team==null|| team.length()==0) team="null";
                     if(userProfile==null || userProfile.length()==0) userProfile="null";
-                    System.out.println(gitUrl+emailId+org+team+userProfile);
+                    System.out.println(gitUrl+emailId+businessVertical+team+userProfile);
                     createJobsForallBranches(jobList);
 
 
