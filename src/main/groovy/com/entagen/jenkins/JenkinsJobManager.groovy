@@ -76,6 +76,7 @@ class JenkinsJobManager {
         // createJobsForallRepo();
         //    createFile();
         callForallTheRepos("/tmp/reposList");
+        reload();
         sleep(10000);
 
         // createJobsForallBranches();
@@ -161,7 +162,7 @@ class JenkinsJobManager {
         if (!fileRead.contains("<name>" + org + "</name>")) {
             println "creating org =>" + org;
             config(filename, rootFolder, "<views>", toInsert);
-            reload();
+           // reload();
 
 
         }
@@ -205,14 +206,14 @@ class JenkinsJobManager {
         HashSet<String> uniqueJobs = createJobSet(jobList);
         // for(int i=0;i<jo)
         createNestedViewOrg(rootFolder);
-        if (!checkRepoPresent()) {
+        /*if (!checkRepoPresent()) {
             println "creating repo";
 
             createRepoView("Git-Structure", getOrg(), getRepo());
             sleep(2000);
         }
 
-     /*   List<String> branchNameList = gitApi.getBranchNames();
+        List<String> branchNameList = gitApi.getBranchNames();
         //  println jenkinsApi.getJobConfig("sandbox-cyclops-Dev_job-develop");
         String config = jenkinsApi.getJobConfig(templateJobPrefix);
 
