@@ -1,10 +1,4 @@
 package com.entagen.jenkins
-
-import groovyx.net.http.ContentType
-import java.util.*;
-import java.io.*;
-
-
 //import org.jvnet.hudson.test.HudsonTestCase;
 
 class JenkinsJobManager {
@@ -218,7 +212,7 @@ class JenkinsJobManager {
             sleep(2000);
         }
 
-        List<String> branchNameList = gitApi.getBranchNames();
+     /*   List<String> branchNameList = gitApi.getBranchNames();
         //  println jenkinsApi.getJobConfig("sandbox-cyclops-Dev_job-develop");
         String config = jenkinsApi.getJobConfig(templateJobPrefix);
 
@@ -260,7 +254,7 @@ class JenkinsJobManager {
 
         }
 
-
+*/
     }
 
     void syncWithRepo() {
