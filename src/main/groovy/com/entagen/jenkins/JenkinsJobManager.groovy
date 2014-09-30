@@ -82,6 +82,8 @@ class JenkinsJobManager {
         // createJobsForallRepo();
         //    createFile();
         callForallTheRepos("/tmp/reposList");
+        sleep(10000);
+
         // createJobsForallBranches();
 
     }
