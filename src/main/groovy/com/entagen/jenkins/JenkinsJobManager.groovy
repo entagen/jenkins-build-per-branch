@@ -104,18 +104,18 @@ class JenkinsJobManager {
                 String[] param = line.split(";");
                 gitUrl = param[4];
                 //format giturl
-                if(gitUrl.contains("git@")) {
+                if (gitUrl.contains("git@")) {
 
 
-                gitUrl = gitUrl.replace(':', '/');
-                gitUrl = gitUrl.replace("git@", "https://");
-                gitUrl = gitUrl.replace(".git", "");
-                if(gitUrl.charAt(gitUrl.length()-1)=='/') {
-                    gitUrl = gitUrl.substring(0, gitUrl.length() - 1);
+                    gitUrl = gitUrl.replace(':', '/');
+                    gitUrl = gitUrl.replace("git@", "https://");
+                    gitUrl = gitUrl.replace(".git", "");
+                    if (gitUrl.charAt(gitUrl.length() - 1) == '/') {
+                        gitUrl = gitUrl.substring(0, gitUrl.length() - 1);
+                    }
                 }
-                }
 
-                if(gitUrl.charAt(gitUrl.length()-1)=='/') {
+                if (gitUrl.charAt(gitUrl.length() - 1) == '/') {
                     gitUrl = gitUrl.substring(0, gitUrl.length() - 1);
                 }
                 gitUrl = gitUrl.replace(".git", "");
@@ -135,6 +135,7 @@ class JenkinsJobManager {
                 repo = getRepo();
 
                 createJobsForallBranches(jobList);
+                sleep(4000);
 
 
             }
@@ -214,6 +215,7 @@ class JenkinsJobManager {
             println "creating repo";
 
             createRepoView("Git-Structure", getOrg(), getRepo());
+            sleep(2000);
         }
 
         List<String> branchNameList = gitApi.getBranchNames();
@@ -251,6 +253,7 @@ class JenkinsJobManager {
                 println "creating job =>" + jobName;
                 jenkinsApi.post(jenkinsApi.buildJobPath("createItem", rootFolder, getOrg(), getRepo()), config, [name: jobName, mode: 'copy', from: templateJobPrefix], ContentType.XML)
                 jenkinsApi.post('job/' + jobName + "/config.xml", config, [:], ContentType.XML)
+                sleep(2000);
                 // break;
             }
 
