@@ -12,9 +12,7 @@ class JenkinsJobManager {
     String branchNameRegex
     String jenkinsUser
     String jenkinsPassword
-    String cleanupJobName
-    String deployJobBaseName
-    
+
     Boolean dryRun = false
     Boolean noViews = false
     Boolean noDelete = false
