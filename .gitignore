@@ -5,6 +5,10 @@
 *.diff
 build
 .gradle
+.settings
+.classpath
+.project
 
 out
 atlassian-ide-plugin.xml
+/bin
