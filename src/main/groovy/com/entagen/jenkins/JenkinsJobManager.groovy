@@ -90,7 +90,7 @@ class JenkinsJobManager {
 
         // don't want actual template jobs, just the jobs that were created from the templates
         return (allJobNames - templateJobNames).findAll { String jobName ->
-            templateBaseJobNames.find { String baseJobName -> jobName.startsWith(baseJobName)}
+            templateBaseJobNames.find { String baseJobName -> jobName.startsWith(baseJobName) && jobName.tokenize("-")[2] ==~ branchNameRegex.replace("/", "_")}
         }
     }
 
