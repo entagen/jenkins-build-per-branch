@@ -66,6 +66,10 @@ class JenkinsApi {
             post('job/' + missingJob.jobName + '/enable')
         }
     }
+	
+	void enableJob(ConcreteJob job) {
+		post('job/' + job.jobName + '/enable')
+	}
 
     void startJob(ConcreteJob job) {
         println "Starting job ${job.jobName}."
