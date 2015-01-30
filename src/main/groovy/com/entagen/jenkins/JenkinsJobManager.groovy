@@ -17,6 +17,7 @@ class JenkinsJobManager {
     Boolean noViews = false
     Boolean noDelete = false
     Boolean startOnCreate = false
+	Boolean enableJob = false
 
     JenkinsApi jenkinsApi
     GitApi gitApi
@@ -63,7 +64,10 @@ class JenkinsJobManager {
         for(ConcreteJob missingJob in missingJobs) {
             println "Creating missing job: ${missingJob.jobName} from ${missingJob.templateJob.jobName}"
             jenkinsApi.cloneJobForBranch(missingJob, templateJobs)
-            if (startOnCreate) {
+			if(enableJob) {
+				jenkinsApi.enableJob(missingJob)
+			}
+			if (startOnCreate) {
                 jenkinsApi.startJob(missingJob)
             }
         }
