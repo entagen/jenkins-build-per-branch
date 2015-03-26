@@ -2,7 +2,7 @@ package com.entagen.jenkins
 
 import org.junit.Test
 
-class GitApiTests extends GroovyTestCase {
+class GitApiTest extends GroovyTestCase {
 
     @Test public void testEachResultLine_goodCommand() {
         GitApi gitApi = new GitApi()
@@ -78,16 +78,14 @@ abd856d2ae658ee5f14889b465f3adcaf65fb52b\trefs/heads/other_branch
         assert ["feature/myfeature"] == branchNames.sort()
     }
 
-}
+    static class GitApiMockedResult extends GitApi {
+        String mockResult = "mock result"
 
-
-class GitApiMockedResult extends GitApi {
-    String mockResult = "mock result"
-
-    @Override
-    void eachResultLine(String command, Closure closure) {
-        mockResult.eachLine { String line ->
-            closure(line)
+        @Override
+        void eachResultLine(String command, Closure closure) {
+            mockResult.eachLine { String line ->
+                closure(line)
+            }
         }
     }
 }
