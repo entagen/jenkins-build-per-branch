@@ -11,7 +11,7 @@ class GitApi {
         List<String> branchNames = []
 
         eachResultLine(command) { String line ->
-            String branchNameRegex = "^.*\trefs/heads/(.*)\$"
+            String branchNameRegex = "^.*\t(refs/heads/.*)\$"
             String branchName = line.find(branchNameRegex) { full, branchName -> branchName }
             Boolean selected = passesFilter(branchName)
             println "\t" + (selected ? "* " : "  ") + "$line"
