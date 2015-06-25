@@ -47,6 +47,7 @@ class JenkinsJobManager {
     public void syncJobs(List<String> allBranchNames, List<String> allJobNames, List<TemplateJob> templateJobs) {
         List<String> currentTemplateDrivenJobNames = templateDrivenJobNames(templateJobs, allJobNames)
         List<String> nonTemplateBranchNames = allBranchNames - templateBranchName
+        println "nonTemplateBranchNames: ${nonTemplateBranchNames}"
         List<ConcreteJob> expectedJobs = this.expectedJobs(templateJobs, nonTemplateBranchNames)
 
         createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
@@ -109,13 +110,11 @@ class JenkinsJobManager {
                 templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: branchName)
             }
 
-            println "templateJob: $templateJob for $jobName"
             return templateJob
         }
 
         assert templateJobs?.size() > 0, "Unable to find any jobs matching template regex: $regex\nYou need at least one job to match the templateJobPrefix and templateBranchName suffix arguments"
 
-        println "templateJobs: $templateJobs"
         return templateJobs
     }
 
