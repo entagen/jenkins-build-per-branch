@@ -51,11 +51,7 @@ class JenkinsJobManager {
         List<ConcreteJob> expectedJobs = this.expectedJobs(templateJobs, nonTemplateBranchNames)
 
         createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
-        if (!noDelete) {
-            deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
-        } else {
-            println "Would have deleted: ${currentTemplateDrivenJobNames - expectedJobs.jobName}"
-        }
+        deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
         if (startExpected) {
             for (ConcreteJob expectedJob : expectedJobs) {
                 jenkinsApi.startJob(expectedJob)
@@ -79,9 +75,15 @@ class JenkinsJobManager {
 
     public void deleteDeprecatedJobs(List<String> deprecatedJobNames) {
         if (!deprecatedJobNames) return
-        println "Deleting deprecated jobs:\n\t${deprecatedJobNames.join('\n\t')}"
         deprecatedJobNames.each { String jobName ->
-            jenkinsApi.deleteJob(jobName)
+            if (!noDelete && jobName.matches(branchNameRegex)) {
+                println "Deleting deprecated job: $jobName"
+                jenkinsApi.deleteJob(jobName)
+            } else if (jobName.matches(branchNameRegex)) {
+                println "Will not delete job: $jobName because it dos not comply to the branchNameRegex $branchNameRegex"
+            } else {
+                println "Would have deleted: $jobName but noDelete is set"
+            }
         }
     }
 
