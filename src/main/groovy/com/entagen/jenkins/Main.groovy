@@ -15,6 +15,7 @@ class Main {
             c: [longOpt: 'print-config', required: false, args: 0, argName: 'printConfig', description:  "Check configuration - print out settings then exit - gradle flag -DprintConfig=true"],
             d: [longOpt: 'dry-run', required: false, args: 0, argName: 'dryRun', description:  "Dry run, don't actually modify, create, or delete any jobs, just print out what would happen - gradle flag: -DdryRun=true"],
             s: [longOpt: 'start-on-create', required: false, args: 0, argName: 'startOnCreate', description:  "When creating a new job, start it at once."],
+            x: [longOpt: 'start-expected', required: false, args: 0, argName: 'startExpected', description:  "Start jobs expected to exist after creation and deletion"],
             v: [longOpt: 'no-views', required: false, args: 0, argName: 'noViews', description: "Suppress view creation - gradle flag -DnoViews=true"],
             r: [longOpt: 'view-regex', required: false, args: 1, argName: 'viewRegex', description: "Supply a custom regex to be applied to any generated views, overriding the default template regex - gradle flag: -DviewRegex=<regex>"],
             k: [longOpt: 'no-delete', required: false, args: 0, argName: 'noDelete', description: "Do not delete (keep) branches and views - gradle flag -DnoDelete=true"],

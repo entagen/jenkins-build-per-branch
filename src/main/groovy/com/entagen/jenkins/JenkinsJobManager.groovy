@@ -1,7 +1,5 @@
 package com.entagen.jenkins
 
-import java.util.regex.Pattern
-
 class JenkinsJobManager {
     String templateJobPrefix
     String templateBranchName
@@ -17,6 +15,7 @@ class JenkinsJobManager {
     Boolean noViews = false
     Boolean noDelete = false
     Boolean startOnCreate = false
+    Boolean startExpected = false
 
     JenkinsApi jenkinsApi
     GitApi gitApi
@@ -54,6 +53,11 @@ class JenkinsJobManager {
         if (!noDelete) {
             deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
         }
+        if (startExpected) {
+            for (ConcreteJob expectedJob : expectedJobs) {
+                jenkinsApi.startJob(expectedJob)
+            }
+        }
     }
 
     public void createMissingJobs(List<ConcreteJob> expectedJobs, List<String> currentJobs, List<TemplateJob> templateJobs) {
@@ -63,7 +67,7 @@ class JenkinsJobManager {
         for(ConcreteJob missingJob in missingJobs) {
             println "Creating missing job: ${missingJob.jobName} from ${missingJob.templateJob.jobName}"
             jenkinsApi.cloneJobForBranch(missingJob, templateJobs)
-            if (startOnCreate) {
+            if (startOnCreate && !startExpected) {
                 jenkinsApi.startJob(missingJob)
             }
         }
