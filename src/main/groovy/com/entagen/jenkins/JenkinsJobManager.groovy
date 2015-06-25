@@ -109,7 +109,7 @@ class JenkinsJobManager {
                 templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: branchName)
             }
 
-            println "templateJob: $templateJob for $jobName"
+            println "templateJob: $templateJob.jobName $templateJob.baseJobName $templateJob.templateBranchNamefor $jobName"
             return templateJob
         }
 
