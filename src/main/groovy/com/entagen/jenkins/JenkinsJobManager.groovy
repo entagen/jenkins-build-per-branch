@@ -79,7 +79,7 @@ class JenkinsJobManager {
             if (!noDelete && jobName.matches(branchNameRegex)) {
                 println "Deleting deprecated job: $jobName"
                 jenkinsApi.deleteJob(jobName)
-            } else if (jobName.matches(branchNameRegex)) {
+            } else if (!jobName.matches(branchNameRegex)) {
                 println "Will not delete job: $jobName because it dos not comply to the branchNameRegex $branchNameRegex"
             } else {
                 println "Would have deleted: $jobName but noDelete is set"
