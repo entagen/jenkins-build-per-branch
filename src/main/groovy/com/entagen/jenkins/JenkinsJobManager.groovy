@@ -114,6 +114,8 @@ class JenkinsJobManager {
         }
 
         assert templateJobs?.size() > 0, "Unable to find any jobs matching template regex: $regex\nYou need at least one job to match the templateJobPrefix and templateBranchName suffix arguments"
+
+        println "templateJobs: $templateJobs"
         return templateJobs
     }
 
