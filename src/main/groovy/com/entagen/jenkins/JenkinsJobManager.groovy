@@ -52,6 +52,8 @@ class JenkinsJobManager {
         createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
         if (!noDelete) {
             deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
+        } else {
+            println "Would have deleted: ${currentTemplateDrivenJobNames - expectedJobs.jobName}"
         }
         if (startExpected) {
             for (ConcreteJob expectedJob : expectedJobs) {
