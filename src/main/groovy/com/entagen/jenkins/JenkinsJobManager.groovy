@@ -77,7 +77,7 @@ class JenkinsJobManager {
         deprecatedJobNames.each { String jobName ->
 
             def shortenedJobName = jobName.substring(templateJobPrefix.length() + 1)
-            def safeBranchNameRegex = branchNameRegex.replaceAll("\\/", _)
+            def safeBranchNameRegex = branchNameRegex.replaceAll("\\/", "_")
             println "Shortened jobName $shortenedJobName"
             println "safeBranchNameRegex $safeBranchNameRegex"
             final def branchNameRegexMatches = shortenedJobName.matches(safeBranchNameRegex)
