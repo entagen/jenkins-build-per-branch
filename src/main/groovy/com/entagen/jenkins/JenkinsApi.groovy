@@ -62,9 +62,9 @@ class JenkinsApi {
         //Forced disable enable to work around Jenkins' automatic disabling of clones jobs
         //But only if the original job was enabled
         post('job/' + missingJob.jobName + '/disable')
-        if (!missingJobConfig.contains("<disabled>true</disabled>")) {
+  //      if (!missingJobConfig.contains("<disabled>true</disabled>")) {
             post('job/' + missingJob.jobName + '/enable')
-        }
+  //      }
     }
 
     void startJob(ConcreteJob job) {
