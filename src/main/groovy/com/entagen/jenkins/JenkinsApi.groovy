@@ -228,30 +228,37 @@ class JenkinsApi {
     static final String VIEW_COLUMNS_JSON = '''
 "columns":[
       {
+         "$class":"hudson.views.StatusColumn",
          "stapler-class":"hudson.views.StatusColumn",
          "kind":"hudson.views.StatusColumn$DescriptorImpl"
       },
       {
+         "$class":"hudson.views.WeatherColumn",
          "stapler-class":"hudson.views.WeatherColumn",
          "kind":"hudson.views.WeatherColumn$DescriptorImpl"
       },
       {
+         "$class":"hudson.views.JobColumn",
          "stapler-class":"hudson.views.JobColumn",
          "kind":"hudson.views.JobColumn$DescriptorImpl"
       },
       {
+         "$class":"hudson.views.LastSuccessColumn",
          "stapler-class":"hudson.views.LastSuccessColumn",
          "kind":"hudson.views.LastSuccessColumn$DescriptorImpl"
       },
       {
+         "$class":"hudson.views.LastFailureColumn",
          "stapler-class":"hudson.views.LastFailureColumn",
          "kind":"hudson.views.LastFailureColumn$DescriptorImpl"
       },
       {
+         "$class":"hudson.views.LastDurationColumn",
          "stapler-class":"hudson.views.LastDurationColumn",
          "kind":"hudson.views.LastDurationColumn$DescriptorImpl"
       },
       {
+         "$class":"hudson.views.BuildButtonColumn",
          "stapler-class":"hudson.views.BuildButtonColumn",
          "kind":"hudson.views.BuildButtonColumn$DescriptorImpl"
       }
