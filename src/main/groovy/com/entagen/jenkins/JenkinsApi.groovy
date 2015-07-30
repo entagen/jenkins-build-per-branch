@@ -209,9 +209,9 @@ class JenkinsApi {
         Integer status = HttpStatus.SC_EXPECTATION_FAILED
 
         http.handler.failure = { resp ->
-            def msg = "Unexpected failure on $jenkinsServerUrl$path: ${resp.statusLine} ${resp.status}"
+            println "Unexpected failure on $jenkinsServerUrl$path: ${resp.statusLine} ${resp.status}"
             status = resp.statusLine.statusCode
-            throw new Exception(msg)
+            return status
         }
 
         http.post(path: path, body: postBody, query: params,
