@@ -91,7 +91,9 @@ class JenkinsApi {
             config = config.replaceAll(it.jobName, it.jobNameForBranch(missingJob.branchName))
         }
 
-        config = config.replaceAll("DnewVersion=1\\.${it.jobName}", "DnewVersion=1\\.${it.jobNameForBranch(missingJob.branchName)}")
+        String branchName = missingJob.branchName.substring(missingJob.branchName.indexOf('/') + 1)
+
+        config = config.replaceAll("DnewVersion=1\\.${templateJob.templateBranchName}", "DnewVersion=1\\.${branchName}")
 
         return config
     }
