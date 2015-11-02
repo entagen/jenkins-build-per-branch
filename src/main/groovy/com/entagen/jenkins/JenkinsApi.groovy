@@ -68,8 +68,11 @@ class JenkinsApi {
     }
 
     void startJob(ConcreteJob job) {
-        println "Starting job ${job.jobName}."
-        post('job/' + job.jobName + '/build')
+        String config = getJobConfig(job.jobName)
+        if (!config.contains("<disabled>true</disabled>")) {
+            println "Starting job ${job.jobName}."
+            post('job/' + job.jobName + '/build')
+        }
     }
 
     String configForMissingJob(ConcreteJob missingJob, List<TemplateJob> templateJobs) {
