@@ -100,6 +100,11 @@ class JenkinsApi {
         println "deleting job $jobName"
         post("job/${jobName}/doDelete")
     }
+
+    void stopJob(String jobName) {
+        println "Stopping $jobName"
+        post("job/${jobName}/lastBuild/stop")
+    }
     
     void wipeOutWorkspace(String jobName) {
         println "wiping out workspace for job $jobName"

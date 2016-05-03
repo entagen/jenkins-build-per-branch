@@ -64,7 +64,7 @@ class JenkinsJobManager {
             println "Creating missing job: ${missingJob.jobName} from ${missingJob.templateJob.jobName}"
             jenkinsApi.cloneJobForBranch(missingJob, templateJobs)
             jenkinsApi.enableJob(missingJob.jobName)
-            if (startOnCreate) {
+            if (startOnCreate && missingJob.jobName.contains("Rev.com-featurebranch-build-feature")) {
                 jenkinsApi.startJob(missingJob)
             }
         }
@@ -74,7 +74,17 @@ class JenkinsJobManager {
         if (!deprecatedJobNames) return
         println "Deleting deprecated jobs:\n\t${deprecatedJobNames.join('\n\t')}"
         deprecatedJobNames.each { String jobName ->
-            jenkinsApi.wipeOutWorkspace(jobName)
+            try {
+                jenkinsApi.wipeOutWorkspace(jobName)
+            }
+            catch(Exception ex) {
+                println "Attempting to stop $jobName since wiping out the workspace failed"
+                jenkinsApi.stopJob(jobName)
+                println "Giving $jobName 15 seconds before wiping out the workspace again"
+                sleep(15000)
+                jenkinsApi.wipeOutWorkspace(jobName)
+            }
+            
             jenkinsApi.deleteJob(jobName)
         }
     }
