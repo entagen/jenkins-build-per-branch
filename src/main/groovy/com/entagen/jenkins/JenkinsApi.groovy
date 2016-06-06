@@ -111,7 +111,21 @@ class JenkinsApi {
         String regex = viewRegex ? viewRegex.replaceAll("master", branchView.safeBranchName) : "${branchView.templateJobPrefix}.*${branchView.safeBranchName}"
         body = [useincluderegex: 'on', includeRegex: regex, name: viewName, json: '{"name": "' + viewName + '","useincluderegex": {"includeRegex": "' + regex + '"},' + VIEW_COLUMNS_JSON + '}']
         println "configuring view ${viewName}"
-        post(buildViewPath("configSubmit", nestedWithinView, viewName), body)
+        int retries = 0
+        while (true) {
+            try {
+                retries++
+                post(buildViewPath("configSubmit", nestedWithinView, viewName), body)
+                return
+            } catch (Exception e) {
+                if (retries < 3) {
+                    println "configSubmit threw exception, retrying in 1 second"
+                    sleep(1000)
+                } else {
+                    throw e
+                }
+            }
+        }
     }
 
     List<String> getViewNames(String nestedWithinView = null) {
