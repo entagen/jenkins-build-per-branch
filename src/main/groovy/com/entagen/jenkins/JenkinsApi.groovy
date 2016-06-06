@@ -60,11 +60,8 @@ class JenkinsApi {
 
         post('job/' + missingJob.jobName + "/config.xml", missingJobConfig, [:], ContentType.XML)
         //Forced disable enable to work around Jenkins' automatic disabling of clones jobs
-        //But only if the original job was enabled
         post('job/' + missingJob.jobName + '/disable')
-        if (!missingJobConfig.contains("<disabled>true</disabled>")) {
-            post('job/' + missingJob.jobName + '/enable')
-        }
+        post('job/' + missingJob.jobName + '/enable')
     }
 
     void startJob(ConcreteJob job) {
@@ -93,6 +90,10 @@ class JenkinsApi {
         templateJobs.each {
             config = config.replaceAll(it.jobName, it.jobNameForBranch(missingJob.branchName))
         }
+
+        String branchName = missingJob.branchName.substring(missingJob.branchName.indexOf('/') + 1)
+
+        config = config.replaceAll("DnewVersion=1\\.${templateJob.templateBranchName}", "DnewVersion=1\\.${branchName}")
 
         return config
     }
@@ -212,9 +213,9 @@ class JenkinsApi {
         Integer status = HttpStatus.SC_EXPECTATION_FAILED
 
         http.handler.failure = { resp ->
-            def msg = "Unexpected failure on $jenkinsServerUrl$path: ${resp.statusLine} ${resp.status}"
+            println "Unexpected failure on $jenkinsServerUrl$path: ${resp.statusLine} ${resp.status}"
             status = resp.statusLine.statusCode
-            throw new Exception(msg)
+            return status
         }
 
         http.post(path: path, body: postBody, query: params,

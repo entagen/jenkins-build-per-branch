@@ -1,7 +1,5 @@
 package com.entagen.jenkins
 
-import java.util.regex.Pattern
-
 class JenkinsJobManager {
     String templateJobPrefix
     String templateBranchName
@@ -17,6 +15,7 @@ class JenkinsJobManager {
     Boolean noViews = false
     Boolean noDelete = false
     Boolean startOnCreate = false
+    Boolean startExpected = false
 
     JenkinsApi jenkinsApi
     GitApi gitApi
@@ -51,8 +50,11 @@ class JenkinsJobManager {
         List<ConcreteJob> expectedJobs = this.expectedJobs(templateJobs, nonTemplateBranchNames)
 
         createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
-        if (!noDelete) {
-            deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
+        deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
+        if (startExpected) {
+            for (ConcreteJob expectedJob : expectedJobs) {
+                jenkinsApi.startJob(expectedJob)
+            }
         }
     }
 
@@ -63,7 +65,7 @@ class JenkinsJobManager {
         for(ConcreteJob missingJob in missingJobs) {
             println "Creating missing job: ${missingJob.jobName} from ${missingJob.templateJob.jobName}"
             jenkinsApi.cloneJobForBranch(missingJob, templateJobs)
-            if (startOnCreate) {
+            if (startOnCreate && !startExpected) {
                 jenkinsApi.startJob(missingJob)
             }
         }
@@ -72,9 +74,19 @@ class JenkinsJobManager {
 
     public void deleteDeprecatedJobs(List<String> deprecatedJobNames) {
         if (!deprecatedJobNames) return
-        println "Deleting deprecated jobs:\n\t${deprecatedJobNames.join('\n\t')}"
         deprecatedJobNames.each { String jobName ->
-            jenkinsApi.deleteJob(jobName)
+
+            def shortenedJobName = jobName.substring(templateJobPrefix.length() + 1)
+            def safeBranchNameRegex = branchNameRegex.replaceAll("\\/", "_")
+            final def branchNameRegexMatches = shortenedJobName.matches(safeBranchNameRegex)
+            if (!noDelete && branchNameRegexMatches) {
+                println "Deleting deprecated job: $jobName"
+                jenkinsApi.deleteJob(jobName)
+            } else if (!branchNameRegexMatches) {
+                println "Will not delete job: $jobName because it dos not comply to the branchNameRegex $branchNameRegex"
+            } else {
+                println "Would have deleted: $jobName but noDelete is set"
+            }
         }
     }
 
@@ -95,17 +107,19 @@ class JenkinsJobManager {
     }
 
     List<TemplateJob> findRequiredTemplateJobs(List<String> allJobNames) {
-        String regex = /^($templateJobPrefix-[^-]*)-($templateBranchName)$/
+        String regex = /^($templateJobPrefix-?[^-]*)-($templateBranchName)$/
 
         List<TemplateJob> templateJobs = allJobNames.findResults { String jobName ->
             TemplateJob templateJob = null
             jobName.find(regex) { full, baseJobName, branchName ->
                 templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: branchName)
             }
+
             return templateJob
         }
 
         assert templateJobs?.size() > 0, "Unable to find any jobs matching template regex: $regex\nYou need at least one job to match the templateJobPrefix and templateBranchName suffix arguments"
+
         return templateJobs
     }
 
