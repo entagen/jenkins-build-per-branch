@@ -8,7 +8,7 @@ import groovyx.net.http.RESTClient
 import net.sf.json.JSON
 import net.sf.json.JSONObject
 
-class JenkinsApiTests extends GroovyTestCase {
+class JenkinsApiTest extends GroovyTestCase {
 
     @Test public void testInvalidHostThrowsConnectionException() {
         JenkinsApi api = new JenkinsApi(jenkinsServerUrl: "http://some-invalid-hostname:9090/jenkins")
@@ -115,7 +115,4 @@ class JenkinsApiTests extends GroovyTestCase {
             closure()
         }
     }
-
-
 }
-
