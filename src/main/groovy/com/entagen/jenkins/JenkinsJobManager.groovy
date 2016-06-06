@@ -1,7 +1,5 @@
 package com.entagen.jenkins
 
-import java.util.regex.Pattern
-
 class JenkinsJobManager {
     String templateJobPrefix
     String templateBranchName
@@ -95,12 +93,13 @@ class JenkinsJobManager {
     }
 
     List<TemplateJob> findRequiredTemplateJobs(List<String> allJobNames) {
-        String regex = /^($templateJobPrefix-[^-]*)-($templateBranchName)$/
+        def templateBranchJobName = templateBranchName.replaceAll('/', '_')
+        String regex = /^($templateJobPrefix-[^-]*)-($templateBranchJobName)$/
 
         List<TemplateJob> templateJobs = allJobNames.findResults { String jobName ->
             TemplateJob templateJob = null
             jobName.find(regex) { full, baseJobName, branchName ->
-                templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: branchName)
+                templateJob = new TemplateJob(jobName: full, baseJobName: baseJobName, templateBranchName: templateBranchName)
             }
             return templateJob
         }
