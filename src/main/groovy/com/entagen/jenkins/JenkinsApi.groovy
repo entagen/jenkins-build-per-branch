@@ -76,7 +76,7 @@ class JenkinsApi {
         TemplateJob templateJob = missingJob.templateJob
         String config = getJobConfig(templateJob.jobName)
 
-        def ignoreTags = ["assignedNode"]
+        def ignoreTags = ["assignedNode", "mergeTarget"]
 
         // should work if there's a remote ("origin/master") or no remote (just "master")
         config = config.replaceAll("(\\p{Alnum}*[>/])(${templateJob.templateBranchName})<") { fullMatch, prefix, branchName ->
