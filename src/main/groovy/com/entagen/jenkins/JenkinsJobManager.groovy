@@ -49,7 +49,7 @@ class JenkinsJobManager {
         List<String> currentTemplateDrivenJobNames = templateDrivenJobNames(templateJobs, allJobNames)
         List<String> nonTemplateBranchNames = allBranchNames - templateBranchName
         List<ConcreteJob> expectedJobs = this.expectedJobs(templateJobs, nonTemplateBranchNames)
-        
+
         createMissingJobs(expectedJobs, currentTemplateDrivenJobNames, templateJobs)
         if (!noDelete) {
             deleteDeprecatedJobs(currentTemplateDrivenJobNames - expectedJobs.jobName)
@@ -57,7 +57,8 @@ class JenkinsJobManager {
     }
 
     public void createMissingJobs(List<ConcreteJob> expectedJobs, List<String> currentJobs, List<TemplateJob> templateJobs) {
-        List<ConcreteJob> missingJobs = expectedJobs.findAll { !currentJobs.contains(it.jobName) }
+        List<String> lowercaseCurrentJobs = currentJobs.collect()*.toLowerCase()
+        List<ConcreteJob> missingJobs = expectedJobs.findAll { !lowercaseCurrentJobs.contains(it.jobName.toLowerCase()) }
         if (!missingJobs) return
 
         for(ConcreteJob missingJob in missingJobs) {
@@ -84,7 +85,7 @@ class JenkinsJobManager {
                 sleep(15000)
                 jenkinsApi.wipeOutWorkspace(jobName)
             }
-            
+
             jenkinsApi.deleteJob(jobName)
         }
     }
