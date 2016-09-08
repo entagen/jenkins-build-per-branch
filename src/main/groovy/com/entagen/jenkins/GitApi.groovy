@@ -7,20 +7,29 @@ class GitApi {
     Pattern branchNameFilter = null
 
     public List<String> getBranchNames() {
-        String command = "git ls-remote --heads ${gitUrl}"
+        String command = 'sh git-branches.sh'
         List<String> branchNames = []
 
         eachResultLine(command) { String line ->
-            String branchNameRegex = "^.*\trefs/heads/(.*)\$"
+            String branchNameRegex = "^.*\torigin/(.*)\$"
             String branchName = line.find(branchNameRegex) { full, branchName -> branchName }
             Boolean selected = passesFilter(branchName)
-            println "\t" + (selected ? "* " : "  ") + "$line"
+            Boolean passedOldCommit = passesLastCommitDateFilter(line)
+            println "\t" + (selected && passedOldCommit ? "* " : "  ") + "$line"
             // lines are in the format of: <SHA>\trefs/heads/BRANCH_NAME
             // ex: b9c209a2bf1c159168bf6bc2dfa9540da7e8c4a26\trefs/heads/master
-            if (selected) branchNames << branchName
+            if (selected && passedOldCommit) branchNames << branchName
         }
 
         return branchNames
+    }
+
+    public Boolean passesLastCommitDateFilter(String branch) {
+        String[] time = branch.tokenize()
+        Integer number = time[0].toInteger()
+        String passed = time[1]
+
+        return number < 5 && passed ==~ "hours|days|months|weeks|years"
     }
 
     public Boolean passesFilter(String branchName) {

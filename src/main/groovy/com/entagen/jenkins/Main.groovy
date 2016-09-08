@@ -26,7 +26,7 @@ class Main {
 
     public static void main(String[] args) {
         Map<String, String> argsMap = parseArgs(args)
-        showConfiguration(argsMap)
+        // showConfiguration(argsMap)
         JenkinsJobManager manager = new JenkinsJobManager(argsMap)
         manager.syncWithRepo()
     }
