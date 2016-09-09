@@ -22,7 +22,7 @@ class Main {
             e: [longOpt: 'enable-job', required: false, args: 1, argName: 'enableJob', description: "When creating a new job, enable it even if template job was disabled - gradle flag: -DenableJob=true"],
             usr: [longOpt: 'jenkins-user',  required: false, args: 1, argName: 'jenkinsUser', description: "Jenkins username - gradle flag -DjenkinsUser=<jenkinsUser>"],
             pwd: [longOpt: 'jenkins-password',  required: false, args: 1, argName: 'jenkinsPassword', description: "Jenkins password - gradle flag -DjenkinsPassword=<jenkinsPassword>"],
-            days: [longOpt: 'days-since-commit', required: false, args: 1, argName: 'daysSinceCommit', description: "Number of days since last commit to create jobs - gradle flag -DdaysSinceCommit=5"]
+            days: [longOpt: 'days', required: false, args: 1, argName: 'days', description: "Number of days since last commit to create jobs - gradle flag -Ddays=5"]
     ]
 
     public static void main(String[] args) {
@@ -81,7 +81,7 @@ class Main {
         println "==============================================================="
     }
 
-    public static formatValue(String key, String value) {
+    public static formatValue(String key, Object value) {
         return (key == "jenkinsPassword") ? "********" : value
     }
 
