@@ -8,7 +8,8 @@ class GitApi {
     Integer daysSinceLastCommit = 5;
 
     public List<String> getBranchNames() {
-        String command = "sh get-branches.sh ${gitUrl}"
+        String repo = gitUrl.substring(gitUrl.lastIndexOf('/') + 1, gitUrl.lastIndexOf('.git'))
+        String command = "sh get-branches.sh ${gitUrl} ${repo}"
         List<String> branchNames = []
 
         eachResultLine(command) { String line ->
