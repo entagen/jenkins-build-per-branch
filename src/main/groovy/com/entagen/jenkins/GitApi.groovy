@@ -36,7 +36,9 @@ class GitApi {
     public Boolean passesFilter(String branchName) {
         if (!branchName) return false
         if (!branchNameFilter) return true
-        return branchName ==~ branchNameFilter
+        Boolean passed = branchName ==~ branchNameFilter
+        println "passed = ${passed}"
+        return passed
     }
 
     // assumes all commands are "safe", if we implement any destructive git commands, we'd want to separate those out for a dry-run
