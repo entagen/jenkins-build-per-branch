@@ -29,6 +29,7 @@ class GitApi {
     public Boolean passesLastCommitDateFilter(String branch) {
         Date lastCommitForBranch = new Date(branch.tokenize()[0].toLong() * 1000)
         Date commitCutoff = new Date() - daysSinceLastCommit
+        println "checking ${branch} commit of ${lastCommitForBranch.toString()} is after ${commitCutoff.toString()}"
         return lastCommitForBranch.after(commitCutoff)
     }
 
