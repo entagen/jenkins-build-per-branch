@@ -5,9 +5,10 @@ import java.util.regex.Pattern
 class GitApi {
     String gitUrl
     Pattern branchNameFilter = null
+    Integer daysSinceLastCommit = 5;
 
     public List<String> getBranchNames() {
-        String command = 'sh git-branches.sh'
+        String command = "sh get-branches.sh ${gitUrl}"
         List<String> branchNames = []
 
         eachResultLine(command) { String line ->
@@ -16,8 +17,8 @@ class GitApi {
             Boolean selected = passesFilter(branchName)
             Boolean passedOldCommit = passesLastCommitDateFilter(line)
             println "\t" + (selected && passedOldCommit ? "* " : "  ") + "$line"
-            // lines are in the format of: <SHA>\trefs/heads/BRANCH_NAME
-            // ex: b9c209a2bf1c159168bf6bc2dfa9540da7e8c4a26\trefs/heads/master
+            // lines are in the format of: lastCommitDate\torigin/BRANCH_NAME
+            // ex: 1471048873 	origin/master
             if (selected && passedOldCommit) branchNames << branchName
         }
 
@@ -25,11 +26,9 @@ class GitApi {
     }
 
     public Boolean passesLastCommitDateFilter(String branch) {
-        String[] time = branch.tokenize()
-        Integer number = time[0].toInteger()
-        String passed = time[1]
-
-        return number < 5 && passed ==~ "hours|days|months|weeks|years"
+        Date lastCommitForBranch = new Date(branch.tokenize()[0].toLong() * 1000)
+        Date commitCutoff = new Date() - daysSinceLastCommit
+        return lastCommitForBranch.after(commitCutoff)
     }
 
     public Boolean passesFilter(String branchName) {
