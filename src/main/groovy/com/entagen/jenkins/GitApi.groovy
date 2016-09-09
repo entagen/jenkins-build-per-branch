@@ -16,7 +16,7 @@ class GitApi {
             String branchNameRegex = "^.*\torigin/(.*)\$"
             String branchName = line.find(branchNameRegex) { full, branchName -> branchName }
             Boolean selected = passesFilter(branchName)
-            Boolean passedOldCommit = passesLastCommitDateFilter(line)
+            Boolean passedOldCommit = true // passesLastCommitDateFilter(line)
             println "\t" + (selected && passedOldCommit ? "* " : "  ") + "$line"
             // lines are in the format of: lastCommitDate\torigin/BRANCH_NAME
             // ex: 1471048873 	origin/master
