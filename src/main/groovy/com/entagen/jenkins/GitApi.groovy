@@ -35,6 +35,7 @@ class GitApi {
     }
 
     public Boolean passesFilter(String branchName) {
+        println "branch name is ${branchName}"
         if (!branchName) return false
         if (!branchNameFilter) return true
         Boolean passed = branchName ==~ branchNameFilter
