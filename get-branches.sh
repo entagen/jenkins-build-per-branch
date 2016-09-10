@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ ! -d $2 ]; then
-    git clone $1
+    git clone $1 || { echo >&2 "failed with $?"; exit 1; }
 fi
 cd $2
 git fetch -p
