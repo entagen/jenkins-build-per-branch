@@ -6,6 +6,7 @@ class GitApi {
     String gitUrl
     Pattern branchNameFilter = null
     Integer daysSinceLastCommit = 5;
+    Boolean disableLastCommit = false;
 
     public List<String> getBranchNames() {
         String repo = gitUrl.substring(gitUrl.lastIndexOf('/') + 1, gitUrl.lastIndexOf('.git'))
@@ -15,7 +16,8 @@ class GitApi {
         eachResultLine(command) { String line ->
             String branchNameRegex = "^.*\torigin/(.*)\$"
             String branchName = line.find(branchNameRegex) { full, branchName -> branchName }
-            Boolean selected = passesFilter(branchName) && passesLastCommitDateFilter(line)
+            Boolean selected = passesFilter(branchName) && (disableLastCommit || passesLastCommitDateFilter(line))
+
             println (selected ? "* " : "  ") + "$line"
             // lines are in the format of: lastCommitDate\torigin/BRANCH_NAME
             // ex: 1471048873\torigin/master
