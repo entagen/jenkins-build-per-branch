@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:1.8.8'
+    groovy 'org.codehaus.groovy:groovy-all:1.8.8'
     compile 'org.apache.ivy:ivy:2.2.0'
     compile 'commons-cli:commons-cli:1.2' // should be part of groovy, but not available when running for some reason
     testCompile 'junit:junit:4.10'
