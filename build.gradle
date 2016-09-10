@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    groovy 'org.codehaus.groovy:groovy-all:1.8.8'
+    compile 'org.codehaus.groovy:groovy-all:1.8.8'
     compile 'org.apache.ivy:ivy:2.2.0'
     compile 'commons-cli:commons-cli:1.2' // should be part of groovy, but not available when running for some reason
     testCompile 'junit:junit:4.10'
@@ -24,7 +24,7 @@ task createSourceDirs(description : 'Create empty source directories for all def
 
 idea {
     project {
-        jdkName = '1.6'
+        jdkName = '1.7'
     }
 }
 
@@ -33,14 +33,14 @@ task syncWithRepo(dependsOn: 'classes', type: JavaExec) {
     main = 'com.entagen.jenkins.Main'
     classpath = sourceSets.main.runtimeClasspath
     // pass through specified system properties to the call to main
-    ['help', 'jenkinsUrl', 'jenkinsUser', 'jenkinsPassword', 'gitUrl', 'templateJobPrefix', 'templateBranchName', 'branchNameRegex', 'nestedView', 'viewRegex', 'printConfig', 'dryRun', 'startOnCreate', 'noViews', 'noDelete', 'enableJob'].each {
+    ['help', 'jenkinsUrl', 'jenkinsUser', 'jenkinsPassword', 'gitUrl', 'templateJobPrefix', 'templateBranchName', 'branchNameRegex', 'nestedView', 'viewRegex', 'printConfig', 'dryRun', 'startOnCreate', 'noViews', 'noDelete', 'enableJob', 'days', 'disableLastCommit'].each {
         if (System.getProperty(it)) systemProperty it, System.getProperty(it)
     }
 
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0'
+    gradleVersion = '2.13'
 }
 
 

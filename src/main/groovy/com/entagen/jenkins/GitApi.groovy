@@ -5,28 +5,41 @@ import java.util.regex.Pattern
 class GitApi {
     String gitUrl
     Pattern branchNameFilter = null
+    Integer daysSinceLastCommit = 5;
+    Boolean disableLastCommit = false;
 
     public List<String> getBranchNames() {
-        String command = "git ls-remote --heads ${gitUrl}"
+        String repo = gitUrl.substring(gitUrl.lastIndexOf('/') + 1, gitUrl.lastIndexOf('.git'))
+        String command = "sh get-branches.sh ${gitUrl} ${repo}"
         List<String> branchNames = []
 
         eachResultLine(command) { String line ->
-            String branchNameRegex = "^.*\trefs/heads/(.*)\$"
+            String branchNameRegex = "^.*\torigin/(.*)\$"
             String branchName = line.find(branchNameRegex) { full, branchName -> branchName }
-            Boolean selected = passesFilter(branchName)
-            println "\t" + (selected ? "* " : "  ") + "$line"
-            // lines are in the format of: <SHA>\trefs/heads/BRANCH_NAME
-            // ex: b9c209a2bf1c159168bf6bc2dfa9540da7e8c4a26\trefs/heads/master
+            Boolean selected = passesFilter(branchName) && (disableLastCommit || passesLastCommitDateFilter(line))
+
+            println (selected ? "* " : "  ") + "$line"
+            // lines are in the format of: lastCommitDate\torigin/BRANCH_NAME
+            // ex: 1471048873\torigin/master
             if (selected) branchNames << branchName
         }
 
         return branchNames
     }
 
+    public Boolean passesLastCommitDateFilter(String branch) {
+        Date lastCommitForBranch = new Date(branch.tokenize()[0].toLong() * 1000)
+        Date commitCutoff = new Date() - daysSinceLastCommit
+        println "checking ${branch} commit of ${lastCommitForBranch.toString()} is after ${commitCutoff.toString()}"
+        return lastCommitForBranch.after(commitCutoff)
+    }
+
     public Boolean passesFilter(String branchName) {
         if (!branchName) return false
         if (!branchNameFilter) return true
-        return branchName ==~ branchNameFilter
+        Boolean passed = branchName ==~ branchNameFilter
+        println "passed = ${passed}"
+        return passed
     }
 
     // assumes all commands are "safe", if we implement any destructive git commands, we'd want to separate those out for a dry-run
