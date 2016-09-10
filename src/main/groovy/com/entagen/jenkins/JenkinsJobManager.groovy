@@ -17,6 +17,7 @@ class JenkinsJobManager {
     Boolean noViews = false
     Boolean noDelete = false
     Boolean startOnCreate = false
+	Boolean enableJob = false
 
     JenkinsApi jenkinsApi
     GitApi gitApi
@@ -63,7 +64,10 @@ class JenkinsJobManager {
         for(ConcreteJob missingJob in missingJobs) {
             println "Creating missing job: ${missingJob.jobName} from ${missingJob.templateJob.jobName}"
             jenkinsApi.cloneJobForBranch(missingJob, templateJobs)
-            if (startOnCreate) {
+			if(enableJob) {
+				jenkinsApi.enableJob(missingJob)
+			}
+			if (startOnCreate) {
                 jenkinsApi.startJob(missingJob)
             }
         }
@@ -90,7 +94,7 @@ class JenkinsJobManager {
 
         // don't want actual template jobs, just the jobs that were created from the templates
         return (allJobNames - templateJobNames).findAll { String jobName ->
-            templateBaseJobNames.find { String baseJobName -> jobName.startsWith(baseJobName)}
+            templateBaseJobNames.find { String baseJobName -> jobName.startsWith(baseJobName) && jobName.tokenize("-")[2] ==~ branchNameRegex.replace("/", "_")}
         }
     }
 
