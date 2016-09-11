@@ -21,7 +21,9 @@ class Main {
             f: [longOpt: 'filter-branch-names', required: false, args:  1, argName:  'branchNameRegex', description: "Only branches matching the regex will be accepted - gradle flag: -DbranchNameRegex=<regex>"],
 			e: [longOpt: 'enable-job', required: false, args: 1, argName: 'enableJob', description: "When creating a new job, enable it even if template job was disabled - gradle flag: -DenableJob=true"],
 			usr: [longOpt: 'jenkins-user',  required: false, args: 1, argName: 'jenkinsUser', description: "Jenkins username - gradle flag -DjenkinsUser=<jenkinsUser>"],
-            pwd: [longOpt: 'jenkins-password',  required: false, args: 1, argName: 'jenkinsPassword', description: "Jenkins password - gradle flag -DjenkinsPassword=<jenkinsPassword>"]
+            pwd: [longOpt: 'jenkins-password',  required: false, args: 1, argName: 'jenkinsPassword', description: "Jenkins password - gradle flag -DjenkinsPassword=<jenkinsPassword>"],
+            days: [longOpt: 'days',  required: false, args: 1, argName: 'days', description: "Creates jobs with commits within the specified number of days - gradle flag -Ddays=5"],
+            dlc: [longOpt: 'disable-last-commit',  required: false, args: 1, argName: 'disableLastCommit', description: "Disables the creation of jobs based on last commit date - gradle flag = -DdisableLastCommit=true"]
     ]
 
     public static void main(String[] args) {
