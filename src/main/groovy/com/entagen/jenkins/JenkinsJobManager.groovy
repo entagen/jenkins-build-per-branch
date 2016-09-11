@@ -18,6 +18,8 @@ class JenkinsJobManager {
     Boolean noDelete = false
     Boolean startOnCreate = false
 	Boolean enableJob = false
+    String days
+    Boolean disableLastCommit
 
     JenkinsApi jenkinsApi
     GitApi gitApi
@@ -165,7 +167,7 @@ class JenkinsJobManager {
     GitApi initGitApi() {
         if (!gitApi) {
             assert gitUrl != null
-            this.gitApi = new GitApi(gitUrl: gitUrl)
+            this.gitApi = new GitApi(gitUrl: gitUrl, daysSinceLastCommit: days.toInteger(), disableLastCommit: disableLastCommit)
             if (this.branchNameRegex){
                 this.gitApi.branchNameFilter = ~this.branchNameRegex
             }
