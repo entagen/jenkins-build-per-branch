@@ -14,8 +14,12 @@ class GitApi {
         List<String> branchNames = []
 
         eachResultLine(command) { String line ->
-            String branchNameRegex = ".*\torigin/(.*)\$"
-            String branchName = line.find(branchNameRegex) { full, branchName -> branchName }
+            String branchNameRegex = "^.*\torigin/(.*)\$"
+            String branchName = line.find(branchNameRegex) { full, branchName ->
+                println "full = ${full}"
+                println "branchName = ${branchName}"
+                return branchName
+            }
             println "branchName = ${branchName}"
             Boolean selected = passesFilter(branchName) && (disableLastCommit || passesLastCommitDateFilter(line))
 
