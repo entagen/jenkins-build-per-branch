@@ -17,7 +17,7 @@ class JenkinsJobManager {
     Boolean noViews = false
     Boolean noDelete = false
     Boolean startOnCreate = false
-	Boolean enableJob = false
+    Boolean enableJob = false
     String days
     Boolean disableLastCommit
 
