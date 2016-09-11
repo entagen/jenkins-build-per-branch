@@ -16,12 +16,7 @@ class GitApi {
         eachResultLine(command) { String line ->
             line = line.replace("\\t", "\t")
             String branchNameRegex = "^.*\torigin/(.*)\$"
-            String branchName = line.find(branchNameRegex) { full, branchName ->
-                println "full = ${full}"
-                println "branchName = ${branchName}"
-                return branchName
-            }
-            println "branchName = ${branchName}"
+            String branchName = line.find(branchNameRegex) { full, branchName -> branchName }
             Boolean selected = passesFilter(branchName) && (disableLastCommit || passesLastCommitDateFilter(line))
 
             println "${(selected ? '* ' : '')}  ${line}"
@@ -36,7 +31,6 @@ class GitApi {
     public Boolean passesLastCommitDateFilter(String branch) {
         Date lastCommitForBranch = new Date(branch.tokenize()[0].toLong() * 1000)
         Date commitCutoff = new Date() - daysSinceLastCommit
-        println "checking ${branch} commit of ${lastCommitForBranch.toString()} is after ${commitCutoff.toString()}"
         return lastCommitForBranch.after(commitCutoff)
     }
 
@@ -44,7 +38,6 @@ class GitApi {
         if (!branchName) return false
         if (!branchNameFilter) return true
         Boolean passed = branchName ==~ branchNameFilter
-        println "passed = ${passed}"
         return passed
     }
 
