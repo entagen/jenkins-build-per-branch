@@ -38,7 +38,6 @@ class GitApi {
         if (!branchName) return false
         if (!branchNameFilter) return true
         Boolean passed = branchName ==~ branchNameFilter
-        println "passed = ${passed}"
         return passed
     }
 
