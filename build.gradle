@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    groovy 'org.codehaus.groovy:groovy-all:1.8.8'
+    compile 'org.codehaus.groovy:groovy-all:2.4.7'
     compile 'org.apache.ivy:ivy:2.2.0'
     compile 'commons-cli:commons-cli:1.2' // should be part of groovy, but not available when running for some reason
     testCompile 'junit:junit:4.10'
@@ -24,7 +24,7 @@ task createSourceDirs(description : 'Create empty source directories for all def
 
 idea {
     project {
-        jdkName = '1.6'
+        jdkName = '1.8'
     }
 }
 
@@ -40,7 +40,7 @@ task syncWithRepo(dependsOn: 'classes', type: JavaExec) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0'
+    gradleVersion = '3.0'
 }
 
 
