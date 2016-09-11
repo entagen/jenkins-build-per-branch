@@ -14,8 +14,8 @@ class GitApi {
         List<String> branchNames = []
 
         eachResultLine(command) { String line ->
-            line = line.replace("\\t", "\n")
-            String branchNameRegex = "^.*\norigin/(.*)\$"
+            line = line.replace("\\t", "\t")
+            String branchNameRegex = "^.*\torigin/(.*)\$"
             String branchName = line.find(branchNameRegex) { full, branchName ->
                 println "full = ${full}"
                 println "branchName = ${branchName}"
