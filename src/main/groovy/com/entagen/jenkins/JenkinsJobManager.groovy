@@ -4,6 +4,7 @@ import java.util.regex.Pattern
 import groovy.json.JsonSlurper
 
 class JenkinsJobManager {
+
     String templateJobPrefix
     String templateBranchName
     String gitUrl
@@ -63,9 +64,27 @@ class JenkinsJobManager {
 
         for(ConcreteJob missingJob in missingJobs) {
             println "Creating missing job: ${missingJob.jobName} from ${missingJob.templateJob.jobName}"
+
+            // This creates missing jobs using the missingJob name. Note that templateJobs is a List.
             jenkinsApi.cloneJobForBranch(missingJob, templateJobs)
-            jenkinsApi.enableJob(missingJob.jobName)
-            if (startOnCreate && missingJob.jobName.contains("Rev.com-featurebranch-build-feature")) {
+
+            // Rev.com-branch is -DtemplateJobPrefix
+            // Rev.com-branch-deploy- is the Jenkins job template
+            // Rev.com-branch-build- is the Jenkins job template
+
+            if (missingJob.jobName.contains("Rev.com-build-unittest")) {
+                // If the job contains unittest enable it. Jobs start out disabled so -deploy- will remain disabled.
+                jenkinsApi.enableJob(missingJob.jobName)
+            }
+            if (!missingJob.jobName.contains("Rev.com-deploy-unittest")) {
+                // Prevent double enabling of unittest jobs.
+                if (!missingJob.jobName.contains("Rev.com-build-unittest")) {
+                    // If the job doesn't contain unittest enable it. Jobs start out disabled.
+                    jenkinsApi.enableJob(missingJob.jobName)
+                }
+            }
+            if (startOnCreate && missingJob.jobName.contains("Rev.com-build-")) {
+                // Starting -build- has the downstream job of -deploy- when successful.
                 jenkinsApi.startJob(missingJob)
             }
         }
