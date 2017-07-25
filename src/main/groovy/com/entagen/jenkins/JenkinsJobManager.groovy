@@ -3,6 +3,8 @@ package com.entagen.jenkins
 import java.util.regex.Pattern
 import groovy.json.JsonSlurper
 
+Boolean failed = false
+
 class JenkinsJobManager {
 
     String templateJobPrefix
@@ -30,7 +32,9 @@ class JenkinsJobManager {
         initGitApi()
     }
 
-    void syncWithRepo() {
+    Boolean syncWithRepo() {
+        failed = false
+
         List<String> allBranchNames = gitApi.branchNames.unique{ it.toLowerCase() }
         List<String> allJobNames = jenkinsApi.jobNames
 
@@ -44,6 +48,8 @@ class JenkinsJobManager {
         if (!noViews) {
             syncViews(allBranchNames)
         }
+
+        return failed
     }
 
     public void syncJobs(List<String> allBranchNames, List<String> allJobNames, List<TemplateJob> templateJobs) {
@@ -64,28 +70,34 @@ class JenkinsJobManager {
 
         for(ConcreteJob missingJob in missingJobs) {
             println "Creating missing job: ${missingJob.jobName} from ${missingJob.templateJob.jobName}"
+            try {
+                // This creates missing jobs using the missingJob name. Note that templateJobs is a List.
+                jenkinsApi.cloneJobForBranch(missingJob, templateJobs)
 
-            // This creates missing jobs using the missingJob name. Note that templateJobs is a List.
-            jenkinsApi.cloneJobForBranch(missingJob, templateJobs)
+                // Rev.com-branch is -DtemplateJobPrefix
+                // Rev.com-branch-deploy- is the Jenkins job template
+                // Rev.com-branch-build- is the Jenkins job template
 
-            // Rev.com-branch is -DtemplateJobPrefix
-            // Rev.com-branch-deploy- is the Jenkins job template
-            // Rev.com-branch-build- is the Jenkins job template
-
-            if (missingJob.jobName.contains("Rev.com-build-unittest")) {
-                // If the job contains unittest enable it. Jobs start out disabled so -deploy- will remain disabled.
-                jenkinsApi.enableJob(missingJob.jobName)
-            }
-            if (!missingJob.jobName.contains("Rev.com-deploy-unittest")) {
-                // Prevent double enabling of unittest jobs.
-                if (!missingJob.jobName.contains("Rev.com-build-unittest")) {
-                    // If the job doesn't contain unittest enable it. Jobs start out disabled.
+                if (missingJob.jobName.contains("Rev.com-build-unittest")) {
+                    // If the job contains unittest enable it. Jobs start out disabled so -deploy- will remain disabled.
                     jenkinsApi.enableJob(missingJob.jobName)
                 }
+                if (!missingJob.jobName.contains("Rev.com-deploy-unittest")) {
+                    // Prevent double enabling of unittest jobs.
+                    if (!missingJob.jobName.contains("Rev.com-build-unittest")) {
+                        // If the job doesn't contain unittest enable it. Jobs start out disabled.
+                        jenkinsApi.enableJob(missingJob.jobName)
+                    }
+                }
+                if (startOnCreate && missingJob.jobName.contains("Rev.com-build-")) {
+                    // Starting -build- has the downstream job of -deploy- when successful.
+                    jenkinsApi.startJob(missingJob)
+                }
             }
-            if (startOnCreate && missingJob.jobName.contains("Rev.com-build-")) {
-                // Starting -build- has the downstream job of -deploy- when successful.
-                jenkinsApi.startJob(missingJob)
+            catch(Exception ex) {
+                println(ex.getMessage());
+                println(ex.getStackTrace());
+                failed = true
             }
         }
     }
@@ -96,16 +108,13 @@ class JenkinsJobManager {
         deprecatedJobNames.each { String jobName ->
             try {
                 jenkinsApi.wipeOutWorkspace(jobName)
+                jenkinsApi.deleteJob(jobName)
             }
             catch(Exception ex) {
-                println "Attempting to stop $jobName since wiping out the workspace failed"
-                jenkinsApi.stopJob(jobName)
-                println "Giving $jobName 15 seconds before wiping out the workspace again"
-                sleep(15000)
-                jenkinsApi.wipeOutWorkspace(jobName)
+                println(ex.getMessage());
+                println(ex.getStackTrace());
+                failed = true
             }
-
-            jenkinsApi.deleteJob(jobName)
         }
     }
 

@@ -28,7 +28,12 @@ class Main {
         Map<String, String> argsMap = parseArgs(args)
         showConfiguration(argsMap)
         JenkinsJobManager manager = new JenkinsJobManager(argsMap)
-        manager.syncWithRepo()
+
+        Boolean failure = manager.syncWithRepo()
+
+        if (failure) {
+            System.exit(1);
+        }
     }
 
     public static Map<String, String> parseArgs(String[] args) {
